@@ -89,6 +89,7 @@ void main(string[] args)
 			try file = File(entry, "r");
 			catch (Exception e)
 			{
+				++skippedFiles;
 				continue;
 			}
 
