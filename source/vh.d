@@ -48,6 +48,11 @@ void main(string[] args)
 
 	immutable path = (args.length > 1) ? args[1] : ".";
 
+	version(Colour)
+	{
+		writef("%s[%dm", BashColourToken, BashReset.all);
+	}
+
 	if (!path.exists)
 	{
 		writeln(path, " does not exist");
