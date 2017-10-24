@@ -54,7 +54,7 @@ void main(string[] args)
 		version(Colour)
 		{
 			//write("\033[0m");
-			write(BashColourToken, "[", Reset.all, "m");
+			writef("%s[%dm", BashColourToken, BashReset.all);
 		}
 
 		auto entries = path.dirEntries(SpanMode.shallow);
@@ -277,7 +277,7 @@ void getNextColour()
 	import std.format : format;
 	import std.range : cycle;
 
-	alias F = Foreground;
+	alias F = BashForeground;
 
 	static immutable colours = [
 		F.red,
@@ -299,7 +299,7 @@ void getNextColour()
 
 	foreach (code; colours.cycle)
 	{
-		yield("%s[%d;%dm".format(BashColourToken, Format.bright, code));
+		yield("%s[%d;%dm".format(BashColourToken, BashFormat.bright, code));
 	}
 }
 
@@ -325,7 +325,7 @@ enum BashEffectToken
 }
 
 /// Format codes for Bash colouring
-enum Format
+enum BashFormat
 {
     bright      = 1,
     dim         = 2,
@@ -336,7 +336,7 @@ enum Format
 }
 
 /// Foreground colour codes for Bash colouring
-enum Foreground
+enum BashForeground
 {
     default_     = 39,
     black        = 30,
@@ -358,35 +358,35 @@ enum Foreground
 }
 
 /// Background colour codes for Bash colouring
-enum Background
+enum BashBackground
 {
-    default_     = "49",
-    black        = "40",
-    red          = "41",
-    green        = "42",
-    yellow       = "43",
-    blue         = "44",
-    magenta      = "45",
-    cyan         = "46",
-    lightgrey    = "47",
-    darkgrey     = "100",
-    lightred     = "101",
-    lightgreen   = "102",
-    lightyellow  = "103",
-    lightblue    = "104",
-    lightmagenta = "105",
-    lightcyan    = "106",
-    white        = "107",
+    default_     = 49,
+    black        = 40,
+    red          = 41,
+    green        = 42,
+    yellow       = 43,
+    blue         = 44,
+    magenta      = 45,
+    cyan         = 46,
+    lightgrey    = 47,
+    darkgrey     = 100,
+    lightred     = 101,
+    lightgreen   = 102,
+    lightyellow  = 103,
+    lightblue    = 104,
+    lightmagenta = 105,
+    lightcyan    = 106,
+    white        = 107,
 }
 
 /// Bash colour/effect reset codes
-enum Reset
+enum BashReset
 {
-    all         = "0",
-    bright      = "21",
-    dim         = "22",
-    underlined  = "24",
-    blink       = "25",
-    invert      = "27",
-    hidden      = "28",
+    all         = 0,
+    bright      = 21,
+    dim         = 22,
+    underlined  = 24,
+    blink       = 25,
+    invert      = 27,
+    hidden      = 28,
 }
