@@ -2,15 +2,15 @@
 
 verbose head
 
-This tool acts like the terminal tool `head`, performed on all files in your current directory. By default only the first three lines are shown and in colours, but this is compile-time configurable.
+This tool acts like the terminal tool `head`, performed on all files in your current directory or one specified at the command-line. By default only the first three lines are shown (`head -n3 *`) and in colours, but this is compile-time configurable.
 
-Future improvements will include being able to specify more than one directory, getopt options and saved configurationfiles.
+Future improvements will include being able to specify more than one directory, getopt options and saved configuration files.
 
 ## Getting started
 
 You need a D compiler, and the official `dub` package manager is recommended. It is however very possible to build the project without it.
 
-There are three compilers available; see [here](https://wiki.dlang.org/Compilers) for an overview. As of October 2017, vh can be built using any of them.
+There are three compilers available; see [here](https://wiki.dlang.org/Compilers) for an overview. As of October 2017, `vh` can be built using any of them.
 
 ### Downloading
 
@@ -40,4 +40,4 @@ Merely place the `vh` executable somewhere in your PATH, and execute it as norma
 * multiple paths
 
 ## License
-This project is licensed under the **MIT** license - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** S- see the [LICENSE](LICENSE) file for details.
