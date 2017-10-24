@@ -3,6 +3,7 @@ module vh;
 import std.stdio;
 
 // version = IgnoreLeadingDots;
+// version = IgnoreCase;
 version = Colour;
 
 enum numberOfLines = 3;
@@ -185,16 +186,23 @@ void present()
 
 	version(IgnoreLeadingDots)
 	{
-		string dotless(string something)
+		static bool headSortPred(FileHead a, FileHead b)
 		{
-			return (something[0..3] == "./.") ? something[3..$] : something[2..$];
-		}
+			static string dotless(string something)
+			{
+				return (something[0..3] == "./.") ? something[3..$] : something[2..$];
+			}
 
-		bool headSortPred(FileHead a, FileHead b)
-		{
-			import std.string : toUpper;
+			version(IgnoreCase)
+			{
+				import std.string : toUpper;
 
-			return toUpper(dotless(a.filename)) < toUpper(dotless(b.filename));
+				return toUpper(dotless(a.filename)) < toUpper(dotless(b.filename));
+			}
+			else
+			{
+				return dotless(a.filename) < dotless(b.filename);
+			}
 		}
 	}
 	else
@@ -203,7 +211,14 @@ void present()
 		{
 			import std.string : toUpper;
 
-			return toUpper(a.filename) < toUpper(b.filename);
+			version(IgnoreCase)
+			{
+				return toUpper(a.filename) < toUpper(b.filename);
+			}
+			else
+			{
+				return a.filename < b.filename;
+			}
 		}
 	}
 
