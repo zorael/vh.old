@@ -172,7 +172,8 @@ void present(VerboseHeadResults res)
 
 	version(Colour)
 	{
-		auto colourGenerator = new Generator!string(&getNextColour);
+		import std.concurrency : Generator;
+		auto colourGenerator = new Generator!string(&cycleBashColours);
 	}
 
 	size_t longestLength = res.allFiles.longestFilenameLength;
@@ -272,7 +273,7 @@ void present(VerboseHeadResults res)
 }
 
 version(Colour)
-void getNextColour()
+void cycleBashColours()
 {
 	import std.concurrency : yield;
 	import std.format : format;
