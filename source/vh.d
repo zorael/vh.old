@@ -150,7 +150,7 @@ void gather(T)(T lines, string filename, ref VerboseHeadResults res)
 }
 
 
-size_t longestFilenameLength(FileHead[] fileheads)
+size_t longestFilenameLength(FileHead[] fileheads) pure @nogc
 {
 	size_t longest;
 
