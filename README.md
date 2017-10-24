@@ -1,4 +1,4 @@
-# vh
+# vh  [![Build Status](https://travis-ci.org/zorael/vh.svg?branch=master)](https://travis-ci.org/zorael/vh)
 
 verbose head
 
