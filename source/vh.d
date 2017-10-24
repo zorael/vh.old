@@ -7,12 +7,16 @@ import std.stdio;
 // version = IgnoreCase;
 version = Colour;
 
+
 enum numberOfLines = 3;
 
-FileHead[] allFiles;
 
-size_t skippedFiles;
-size_t skippedDirs;
+struct VerboseHeadResults
+{
+	FileHead[] allFiles;
+	size_t skippedFiles;
+	size_t skippedDirs;
+}
 
 
 struct FileHead
@@ -50,69 +54,57 @@ void main(string[] args)
 		return;
 	}
 
-	if (path.isDir)
-	{
-		version(Colour)
-		{
-			writef("%s[%dm", BashColourToken, BashReset.all);
-		}
-
-		auto entries = path.dirEntries(SpanMode.shallow);
-
-		foreach (entry; entries)
-		{
-			if (entry.isDir)
-			{
-				++skippedDirs;
-				continue;
-			}
-
-			import core.sys.posix.sys.stat;
-
-			const s = entry.statBuf.st_mode;
-
-			if ((s & S_IFIFO) ||
-				(s & S_IFCHR) ||
-				(s & S_IFBLK))/* ||
-				(s & S_IFSOCK))*/
-			{
-				/*writeln(entry.name, " IS SOMETHING");
-				writeln("S_IFIFO: ", (s & S_IFIFO) > 0);
-				writeln("S_IFCHR: ", (s & S_IFCHR) > 0);
-				writeln("S_IFBLK: ", (s & S_IFBLK) > 0);
-				//writeln("S_IFSOCK: ", (s & S_IFSOCK) > 0);*/
-				++skippedFiles;
-				continue;
-			}
-
-			File file;
-
-			try file = File(entry, "r");
-			catch (Exception e)
-			{
-				++skippedFiles;
-				continue;
-			}
-
-			write(".");
-
-			file
-				.byLineCopy
-				.gather(entry.name);
-		}
-	}
-	else
+	if (!path.isDir)
 	{
 		writeln("Only support directory paths so far");
 		return;
 	}
 
+	VerboseHeadResults res;
+	auto entries = path.dirEntries(SpanMode.shallow);
+
+	foreach (entry; entries)
+	{
+		if (entry.isDir)
+		{
+			++res.skippedDirs;
+			continue;
+		}
+
+		import core.sys.posix.sys.stat;
+
+		const s = entry.statBuf.st_mode;
+
+		if ((s & S_IFIFO) ||
+			(s & S_IFCHR) ||
+			(s & S_IFBLK))
+		{
+			++res.skippedFiles;
+			continue;
+		}
+
+		File file;
+
+		try file = File(entry, "r");
+		catch (Exception e)
+		{
+			++res.skippedFiles;
+			continue;
+		}
+
+		write(".");
+
+		file
+			.byLineCopy
+			.gather(entry.name, res);
+	}
+
 	writeln();
-	present();
+	present(res);
 }
 
 
-void gather(T)(T lines, string filename)
+void gather(T)(T lines, string filename, ref VerboseHeadResults res)
 {
 	import std.array : Appender;
 	import std.range : take;
@@ -133,7 +125,7 @@ void gather(T)(T lines, string filename)
 		}
 		catch (UTFException e)
 		{
-			++skippedFiles;
+			++res.skippedFiles;
 			return;
 		}
 	}
@@ -148,7 +140,7 @@ void gather(T)(T lines, string filename)
 
 	head.linecount = linecount;
 	head.lines = sink.data;
-	allFiles ~= head;
+	res.allFiles ~= head;
 }
 
 
@@ -165,7 +157,7 @@ size_t longestFilenameLength(FileHead[] fileheads)
 }
 
 
-void present()
+void present(VerboseHeadResults res)
 {
 	import std.algorithm : sort, SwapStrategy;
 	import std.concurrency;
@@ -178,7 +170,7 @@ void present()
 		auto colourGenerator = new Generator!string(&getNextColour);
 	}
 
-	size_t longestLength = allFiles.longestFilenameLength;
+	size_t longestLength = res.allFiles.longestFilenameLength;
 	immutable pattern = " %%-%ds %%d: %%s".format(longestLength);
 
 	//foreach (fileline; allFiles.sort!("toUpper(a.filename) < toUpper(b.filename)", SwapStrategy.stable))
@@ -222,8 +214,12 @@ void present()
 		}
 	}
 
-	foreach (fileline; allFiles.sort!(headSortPred, SwapStrategy.stable))
+	import std.algorithm : sort, SwapStrategy;
+
+	foreach (fileline; res.allFiles.sort!(headSortPred, SwapStrategy.stable))
 	{
+		import std.path : baseName;
+
 		version(Colour)
 		{
 			write(colourGenerator.front);
