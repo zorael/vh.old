@@ -151,13 +151,13 @@ void gather(T)(T lines, string filename)
 }
 
 
-size_t longestFilenameLength()
+size_t longestFilenameLength(FileHead[] fileheads)
 {
 	size_t longest;
 
-	foreach (fileline; allFiles)
+	foreach (filehead; fileheads)
 	{
-		longest = (fileline.filename.length > longest) ? fileline.filename.length : longest;
+		longest = (filehead.filename.length > longest) ? filehead.filename.length : longest;
 	}
 
 	return longest;
@@ -177,7 +177,7 @@ void present()
 		auto colourGenerator = new Generator!string(&getNextColour);
 	}
 
-	size_t longestLength = longestFilenameLength;
+	size_t longestLength = allFiles.longestFilenameLength;
 	immutable pattern = " %%-%ds %%d: %%s".format(longestLength);
 
 	//foreach (fileline; allFiles.sort!("toUpper(a.filename) < toUpper(b.filename)", SwapStrategy.stable))
