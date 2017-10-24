@@ -267,9 +267,9 @@ void present(VerboseHeadResults res)
 
 	writefln("%s[%dm", BashColourToken, BashReset.all);
 	writefln("%d %s listed, with %d %s and %d %s skipped",
-		allFiles.length, allFiles.length.plurality("file", "files"),
-		skippedFiles, skippedFiles.plurality("file", "files"),
-		skippedDirs, skippedDirs.plurality("directory", "directories"));
+		res.allFiles.length, res.allFiles.length.plurality("file", "files"),
+		res.skippedFiles, res.skippedFiles.plurality("file", "files"),
+		res.skippedDirs, res.skippedDirs.plurality("directory", "directories"));
 }
 
 version(Colour)
