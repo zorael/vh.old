@@ -1,3 +1,5 @@
+module vh;
+
 import std.stdio;
 
 void main()
