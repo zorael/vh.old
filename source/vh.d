@@ -79,12 +79,22 @@ void main(string[] args)
 
 		import core.sys.posix.sys.stat;
 
-		const s = entry.statBuf.st_mode;
-
-		if ((s & S_IFIFO) ||
-			(s & S_IFCHR) ||
-			(s & S_IFBLK))
+		try
 		{
+			const s = entry.statBuf.st_mode;
+
+			if ((s & S_IFIFO) ||
+				(s & S_IFCHR) ||
+				(s & S_IFBLK))
+			{
+				++res.skippedFiles;
+				continue;
+			}
+		}
+		catch (Exception e)
+		{
+			// object.Exception@std/file.d(3216): Failed to stat file `./rcmysql'
+			// (broken link)
 			++res.skippedFiles;
 			continue;
 		}
