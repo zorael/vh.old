@@ -54,7 +54,6 @@ void main(string[] args)
 	{
 		version(Colour)
 		{
-			//write("\033[0m");
 			writef("%s[%dm", BashColourToken, BashReset.all);
 		}
 
@@ -255,7 +254,7 @@ void present()
 		{
 			version(Colour)
 			{
-				write("\033[0m");
+				writef("%s[%dm", BashColourToken, BashReset.all);
 			}
 
 			immutable linesTruncated = (fileline.linecount - linesConsumed);
@@ -264,7 +263,7 @@ void present()
 		}
 	}
 
-	writeln("\033[0m");
+	writefln("%s[%dm", BashColourToken, BashReset.all);
 	writefln("%d %s listed, with %d %s and %d %s skipped",
 		allFiles.length, allFiles.length.plurality("file", "files"),
 		skippedFiles, skippedFiles.plurality("file", "files"),
