@@ -33,6 +33,7 @@ struct FileHead
 	this(string[] filelines)
 	{
 		filename = filelines[0];
+
 		if (filelines.length > 1)
 		{
 			lines = filelines[1..$];
@@ -155,7 +156,8 @@ size_t longestFilenameLength(FileHead[] fileheads)
 
 	foreach (filehead; fileheads)
 	{
-		longest = (filehead.filename.length > longest) ? filehead.filename.length : longest;
+		longest = (filehead.filename.length > longest) ?
+			filehead.filename.length : longest;
 	}
 
 	return longest;
@@ -164,11 +166,7 @@ size_t longestFilenameLength(FileHead[] fileheads)
 
 void present(VerboseHeadResults res)
 {
-	import std.algorithm : sort, SwapStrategy;
-	import std.concurrency;
 	import std.format : format;
-	import std.path : baseName;
-	import std.string;
 
 	version(Colour)
 	{
@@ -178,9 +176,6 @@ void present(VerboseHeadResults res)
 
 	size_t longestLength = res.allFiles.longestFilenameLength;
 	immutable pattern = " %%-%ds %%d: %%s".format(longestLength);
-
-	//foreach (fileline; allFiles.sort!("toUpper(a.filename) < toUpper(b.filename)", SwapStrategy.stable))
-	//foreach (fileline; allFiles.sort!((a,b) => toUpper2(a.filename.dotless) < toUpper2(b.filename.dotless), SwapStrategy.stable))
 
 	version(IgnoreLeadingDots)
 	{
@@ -260,7 +255,9 @@ void present(VerboseHeadResults res)
 			}
 
 			immutable linesTruncated = (fileline.linecount - linesConsumed);
-			immutable linecountPattern = format!" %%-%ds [%%d %s truncated]"(longestLength, linesTruncated.plurality("line", "lines"));
+			immutable linecountPattern =
+				format!" %%-%ds [%%d %s truncated]"
+				(longestLength, linesTruncated.plurality("line", "lines"));
 			writefln(linecountPattern, string.init, linesTruncated);
 		}
 	}
@@ -271,6 +268,7 @@ void present(VerboseHeadResults res)
 		res.skippedFiles, res.skippedFiles.plurality("file", "files"),
 		res.skippedDirs, res.skippedDirs.plurality("directory", "directories"));
 }
+
 
 version(Colour)
 void cycleBashColours()
