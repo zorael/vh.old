@@ -1,0 +1,11 @@
+language: d
+
+d:
+    - dmd
+    - ldc
+    - gdc
+
+os:
+    - linux
+    - windows
+    - osx
