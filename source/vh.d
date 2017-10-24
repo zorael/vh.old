@@ -163,13 +163,6 @@ size_t longestFilenameLength()
 	return longest;
 }
 
-string toUpper2(string a)
-{
-	import std.string;
-	writeln(a);
-	return a.toUpper();
-}
-
 
 void present()
 {
