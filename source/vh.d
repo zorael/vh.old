@@ -79,44 +79,24 @@ void main(string[] args)
 					continue;
 				}
 
-				if (!isNormalFile(entry.name))
-				{
-					++res.skippedFiles;
-					continue;
-				}
-
-				File file;
-
-				try file = File(entry, "r");
-				catch (Exception e)
+				if (!isNormalFile(entry.name) || !entry.name.canBeRead)
 				{
 					++res.skippedFiles;
 					continue;
 				}
 
 				files ~= entry.name;
-				write(".");
 			}
 		}
 		else if (path.isFile)
 		{
-			if (!isNormalFile(path))
-			{
-				++res.skippedFiles;
-				continue;
-			}
-
-			File file;
-
-			try file = File(path, "r");
-			catch (Exception e)
+			if (!isNormalFile(path) || !path.canBeRead)
 			{
 				++res.skippedFiles;
 				continue;
 			}
 
 			files ~= path;
-			write(".");
 		}
 		else
 		{
@@ -125,6 +105,8 @@ void main(string[] args)
 			++res.skippedFiles;
 			continue;
 		}
+
+		write(".");
 	}
 
 	foreach (filename; files)
@@ -138,6 +120,19 @@ void main(string[] args)
 
 	writeln();
 	present(res);
+}
+
+bool canBeRead(string filename)
+{
+	File file;
+
+	try file = File(filename, "r");
+	catch (Exception e)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 bool isNormalFile(string filename)
