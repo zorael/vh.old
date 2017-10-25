@@ -46,9 +46,10 @@ struct FileHead
 void main(string[] args)
 {
 	import std.file : dirEntries, SpanMode;
-	import std.path : exists, isDir;
+	import std.path : exists, isDir, isFile;
 
-	immutable path = (args.length > 1) ? args[1] : ".";
+	string[] paths = (args.length > 1) ? args[1..$] : [ "." ];
+	string[] files;
 
 	version(Colour)
 	{
@@ -56,52 +57,83 @@ void main(string[] args)
 	}
 
 	VerboseHeadResults res;
-	auto entries = path.dirEntries(SpanMode.shallow);
 
-	foreach (entry; entries)
+	foreach (path; paths)
 	{
-		if (entry.isDir)
+		if (!path.exists)
 		{
-			++res.skippedDirs;
+			writeln(path, " does not exist");
 			continue;
 		}
 
-		import core.sys.posix.sys.stat;
-
-		try
+		if (path.isDir)
 		{
-			const s = entry.statBuf.st_mode;
+			auto entries = path.dirEntries(SpanMode.shallow);
 
-			if ((s & S_IFIFO) ||
-				(s & S_IFCHR) ||
-				(s & S_IFBLK))
+			foreach (entry; entries)
+			{
+				if (entry.isDir)
+				{
+					// don't recurse
+					++res.skippedDirs;
+					continue;
+				}
+
+				if (!isNormalFile(entry.name))
+				{
+					++res.skippedFiles;
+					continue;
+				}
+
+				File file;
+
+				try file = File(entry, "r");
+				catch (Exception e)
+				{
+					++res.skippedFiles;
+					continue;
+				}
+
+				files ~= entry.name;
+				write(".");
+			}
+		}
+		else if (path.isFile)
+		{
+			if (!isNormalFile(path))
 			{
 				++res.skippedFiles;
 				continue;
 			}
+
+			File file;
+
+			try file = File(path, "r");
+			catch (Exception e)
+			{
+				++res.skippedFiles;
+				continue;
+			}
+
+			files ~= path;
+			write(".");
 		}
-		catch (Exception e)
+		else
 		{
-			// object.Exception@std/file.d(3216): Failed to stat file `./rcmysql'
-			// (broken link)
+			writeln();
+			writeln("don't understand ", path);
 			++res.skippedFiles;
 			continue;
 		}
+	}
 
-		File file;
-
-		try file = File(entry, "r");
-		catch (Exception e)
-		{
-			++res.skippedFiles;
-			continue;
-		}
-
-		write(".");
+	foreach (filename; files)
+	{
+		auto file = File(filename, "r");
 
 		file
 			.byLineCopy
-			.gather(entry.name, res);
+			.gather(filename, res);
 	}
 
 	writeln();
