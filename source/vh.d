@@ -2,6 +2,7 @@ module vh;
 
 import bash;
 import std.stdio;
+import std.file : DirEntry;
 
 // version = IgnoreLeadingDots;
 // version = IgnoreCase;
@@ -117,6 +118,40 @@ void main(string[] args)
 
 	writeln();
 	present(res);
+}
+
+bool isNormalFile(string filename)
+{
+	return DirEntry(filename).isNormalFile();
+}
+
+bool isNormalFile(DirEntry entry)
+{
+	import core.sys.posix.sys.stat;
+	import std.path : isFile, DirEntry;
+
+	if (!entry.isFile) return false;
+
+	try
+	{
+		const stat = entry.statBuf.st_mode;
+
+		if ((stat & S_IFIFO) ||
+			(stat & S_IFCHR) ||
+			(stat & S_IFBLK))
+		{
+			// Either a FIFO, a character file or a block file
+			return false;
+		}
+	}
+	catch (Exception e)
+	{
+		// object.Exception@std/file.d(3216): Failed to stat file `./rcmysql'
+		// (broken link)
+		return false;
+	}
+
+	return true;
 }
 
 
