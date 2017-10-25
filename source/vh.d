@@ -55,18 +55,6 @@ void main(string[] args)
 		writef("%s[%dm", BashColourToken, BashReset.all);
 	}
 
-	if (!path.exists)
-	{
-		writeln(path, " does not exist");
-		return;
-	}
-
-	if (!path.isDir)
-	{
-		writeln("Only support directory paths so far");
-		return;
-	}
-
 	VerboseHeadResults res;
 	auto entries = path.dirEntries(SpanMode.shallow);
 
