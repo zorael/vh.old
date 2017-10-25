@@ -6,7 +6,11 @@ import std.file : DirEntry;
 
 // version = IgnoreLeadingDots;
 // version = IgnoreCase;
-version = Colour;
+
+version(Posix)
+{
+	version = Colour;
+}
 
 
 enum numberOfLines = 3;
