@@ -10,14 +10,13 @@ version(Posix)
 	version = Colour;
 }
 
-
 enum numberOfLines = 3;
 enum bashResetToken = "%s[%dm".format(BashColourToken, BashReset.all);
 
 
 struct Context
 {
-	FileHead[] allFiles;
+	FileHead[] files;
 	size_t skippedFiles;
 	size_t skippedDirs;
 }
@@ -247,7 +246,7 @@ void present(Context ctx)
 		auto colourGenerator = new Generator!string(&cycleBashColours);
 	}
 
-	size_t longestLength = ctx.allFiles.longestFilenameLength;
+	size_t longestLength = ctx.files.longestFilenameLength;
 	immutable pattern = " %%-%ds %%d: %%s".format(longestLength+1);
 
 	static bool headSortPred(FileHead a, FileHead b)
@@ -269,7 +268,7 @@ void present(Context ctx)
 
 	import std.algorithm : sort, SwapStrategy, uniq;
 
-	foreach (fileline; ctx.allFiles.sort!(headSortPred, SwapStrategy.stable).uniq)
+	foreach (fileline; ctx.files.sort!(headSortPred, SwapStrategy.stable).uniq)
 	{
 		import std.path : baseName;
 
@@ -317,7 +316,7 @@ void present(Context ctx)
 
 	writeln(bashResetToken);
 	writefln("%d %s listed, with %d %s and %d %s skipped",
-		ctx.allFiles.length, ctx.allFiles.length.plurality("file", "files"),
+		ctx.files.length, ctx.files.length.plurality("file", "files"),
 		ctx.skippedFiles, ctx.skippedFiles.plurality("file", "files"),
 		ctx.skippedDirs, ctx.skippedDirs.plurality("directory", "directories"));
 }
