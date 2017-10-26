@@ -242,41 +242,20 @@ void present(VerboseHeadResults res)
 	size_t longestLength = res.allFiles.longestFilenameLength;
 	immutable pattern = " %%-%ds %%d: %%s".format(longestLength);
 
-	version(IgnoreLeadingDots)
+	static bool headSortPred(FileHead a, FileHead b)
 	{
-		static bool headSortPred(FileHead a, FileHead b)
+		import std.string : toUpper;
+
+		version(IgnoreCase)
 		{
-			static string dotless(string something)
-			{
-				return (something[0..3] == "./.") ? something[3..$] : something[2..$];
-			}
-
-			version(IgnoreCase)
-			{
-				import std.string : toUpper;
-
-				return toUpper(dotless(a.filename)) < toUpper(dotless(b.filename));
-			}
-			else
-			{
-				return dotless(a.filename) < dotless(b.filename);
-			}
+			// Do we even want to strip leading dotslash here?
+			// It sorts well enough with it
+			return (a.filename.withoutDotSlash.toUpper <
+					b.filename.withoutDotSlash.toUpper);
 		}
-	}
-	else
-	{
-		bool headSortPred(FileHead a, FileHead b)
+		else
 		{
-			import std.string : toUpper;
-
-			version(IgnoreCase)
-			{
-				return toUpper(a.filename) < toUpper(b.filename);
-			}
-			else
-			{
-				return a.filename < b.filename;
-			}
+			return a.filename < b.filename;
 		}
 	}
 
