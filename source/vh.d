@@ -17,7 +17,7 @@ version(Posix)
 enum numberOfLines = 3;
 
 
-struct VerboseHeadResults
+struct Context
 {
 	FileHead[] allFiles;
 	size_t skippedFiles;
@@ -62,7 +62,7 @@ void main(string[] args)
 		writef("%s[%dm", BashColourToken, BashReset.all);
 	}
 
-	VerboseHeadResults res;
+	Context ctx;
 
 	foreach (path; paths.uniq)
 	{
@@ -81,13 +81,13 @@ void main(string[] args)
 				if (entry.isDir)
 				{
 					// don't recurse
-					++res.skippedDirs;
+					++ctx.skippedDirs;
 					continue;
 				}
 
 				if (!isNormalFile(entry.name) || !entry.name.canBeRead)
 				{
-					++res.skippedFiles;
+					++ctx.skippedFiles;
 					continue;
 				}
 
@@ -98,7 +98,7 @@ void main(string[] args)
 		{
 			if (!isNormalFile(path) || !path.canBeRead)
 			{
-				++res.skippedFiles;
+				++ctx.skippedFiles;
 				continue;
 			}
 
@@ -108,7 +108,7 @@ void main(string[] args)
 		{
 			writeln();
 			writeln("don't understand ", path);
-			++res.skippedFiles;
+			++ctx.skippedFiles;
 			continue;
 		}
 
@@ -121,11 +121,11 @@ void main(string[] args)
 
 		file
 			.byLineCopy
-			.gather(filename, res);
+			.gather(filename, ctx);
 	}
 
 	writeln();
-	present(res);
+	present(ctx);
 }
 
 bool canBeRead(string filename)
@@ -176,7 +176,7 @@ bool isNormalFile(DirEntry entry)
 }
 
 
-void gather(T)(T lines, const string filename, ref VerboseHeadResults res)
+void gather(T)(T lines, const string filename, ref Context ctx)
 {
 	import std.array : Appender;
 	import std.range : take;
@@ -197,7 +197,7 @@ void gather(T)(T lines, const string filename, ref VerboseHeadResults res)
 		}
 		catch (UTFException e)
 		{
-			++res.skippedFiles;
+			++ctx.skippedFiles;
 			return;
 		}
 	}
@@ -212,7 +212,7 @@ void gather(T)(T lines, const string filename, ref VerboseHeadResults res)
 
 	head.linecount = linecount;
 	head.lines = sink.data;
-	res.allFiles ~= head;
+	ctx.allFiles ~= head;
 }
 
 
@@ -238,7 +238,7 @@ string withoutDotSlash(const string filename) pure @nogc
 }
 
 
-void present(VerboseHeadResults res)
+void present(Context ctx)
 {
 	version(Colour)
 	{
@@ -246,7 +246,7 @@ void present(VerboseHeadResults res)
 		auto colourGenerator = new Generator!string(&cycleBashColours);
 	}
 
-	size_t longestLength = res.allFiles.longestFilenameLength;
+	size_t longestLength = ctx.allFiles.longestFilenameLength;
 	immutable pattern = " %%-%ds %%d: %%s".format(longestLength+1);
 
 	static bool headSortPred(FileHead a, FileHead b)
@@ -268,7 +268,7 @@ void present(VerboseHeadResults res)
 
 	import std.algorithm : sort, SwapStrategy, uniq;
 
-	foreach (fileline; res.allFiles.sort!(headSortPred, SwapStrategy.stable))
+	foreach (fileline; ctx.allFiles.sort!(headSortPred, SwapStrategy.stable).uniq)
 	{
 		import std.path : baseName;
 
@@ -316,9 +316,9 @@ void present(VerboseHeadResults res)
 
 	writefln("%s[%dm", BashColourToken, BashReset.all);
 	writefln("%d %s listed, with %d %s and %d %s skipped",
-		res.allFiles.length, res.allFiles.length.plurality("file", "files"),
-		res.skippedFiles, res.skippedFiles.plurality("file", "files"),
-		res.skippedDirs, res.skippedDirs.plurality("directory", "directories"));
+		ctx.allFiles.length, ctx.allFiles.length.plurality("file", "files"),
+		ctx.skippedFiles, ctx.skippedFiles.plurality("file", "files"),
+		ctx.skippedDirs, ctx.skippedDirs.plurality("directory", "directories"));
 }
 
 
