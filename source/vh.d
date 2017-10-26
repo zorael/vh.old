@@ -15,6 +15,7 @@ version(Posix)
 
 
 enum numberOfLines = 3;
+enum bashResetToken = "%s[%dm".format(BashColourToken, BashReset.all);
 
 
 struct Context
@@ -59,7 +60,7 @@ void main(string[] args)
 
 	version(Colour)
 	{
-		writef("%s[%dm", BashColourToken, BashReset.all);
+		write(bashResetToken);
 	}
 
 	Context ctx;
@@ -303,7 +304,7 @@ void present(Context ctx)
 		{
 			version(Colour)
 			{
-				writef("%s[%dm", BashColourToken, BashReset.all);
+				write(bashResetToken);
 			}
 
 			immutable linesTruncated = (fileline.linecount - linesConsumed);
@@ -314,7 +315,7 @@ void present(Context ctx)
 		}
 	}
 
-	writefln("%s[%dm", BashColourToken, BashReset.all);
+	writeln(bashResetToken);
 	writefln("%d %s listed, with %d %s and %d %s skipped",
 		ctx.allFiles.length, ctx.allFiles.length.plurality("file", "files"),
 		ctx.skippedFiles, ctx.skippedFiles.plurality("file", "files"),
