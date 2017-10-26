@@ -140,7 +140,7 @@ bool canBeRead(string filename)
 	return true;
 }
 
-bool isNormalFile(string filename)
+bool isNormalFile(const string filename)
 {
 	return DirEntry(filename).isNormalFile();
 }
@@ -175,7 +175,7 @@ bool isNormalFile(DirEntry entry)
 }
 
 
-void gather(T)(T lines, string filename, ref VerboseHeadResults res)
+void gather(T)(T lines, const string filename, ref VerboseHeadResults res)
 {
 	import std.array : Appender;
 	import std.range : take;
