@@ -221,18 +221,24 @@ size_t longestFilenameLength(FileHead[] fileheads) pure @nogc
 
 	foreach (filehead; fileheads)
 	{
-		longest = (filehead.filename.length > longest) ?
-			filehead.filename.length : longest;
+		immutable dotlessLength = filehead.filename.withoutDotSlash.length;
+		longest = (dotlessLength > longest) ? dotlessLength : longest;
 	}
 
 	return longest;
 }
 
 
+string withoutDotSlash(const string filename) pure @nogc
+{
+	debug assert((filename.length > 2), "Unexpected filename length: %d"
+								  .format(filename.length));
+	return (filename[0..2] == "./") ? filename[2..$] : filename;
+}
+
+
 void present(VerboseHeadResults res)
 {
-	import std.format : format;
-
 	version(Colour)
 	{
 		import std.concurrency : Generator;
@@ -275,13 +281,14 @@ void present(VerboseHeadResults res)
 
 		if (fileline.empty)
 		{
-			writefln(pattern, fileline.filename.baseName, 0, "< empty >");
+			writefln(pattern, fileline.filename, 0, "< empty >");
 		}
 		else foreach (lineNumber, line; fileline.lines)
 		{
 			if (lineNumber == 0)
 			{
-				writefln(pattern, fileline.filename.baseName, lineNumber+1, line);
+				writefln(pattern, fileline.filename.withoutDotSlash,
+						 lineNumber+1, line);
 			}
 			else
 			{
