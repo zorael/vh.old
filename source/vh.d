@@ -3,6 +3,7 @@ module vh;
 import bash;
 import std.stdio;
 import std.file : DirEntry;
+import std.format : format;
 
 // version = IgnoreLeadingDots;
 // version = IgnoreCase;
