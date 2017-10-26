@@ -34,6 +34,11 @@ struct FileHead
 		return !lines.length;
 	}
 
+	bool opEquals(T)(T that)
+	{
+		return (this.filename == that.filename);
+	}
+
 	this(string[] filelines)
 	{
 		filename = filelines[0];
