@@ -251,19 +251,7 @@ void present(Context ctx)
 
 	static bool headSortPred(FileHead a, FileHead b)
 	{
-		import std.string : toUpper;
-
-		version(IgnoreCase)
-		{
-			// Do we even want to strip leading dotslash here?
-			// It sorts well enough with it
-			return (a.filename.withoutDotSlash.toUpper <
-					b.filename.withoutDotSlash.toUpper);
-		}
-		else
-		{
-			return a.filename < b.filename;
-		}
+		return a.filename == b.filename;
 	}
 
 	import std.algorithm : sort, SwapStrategy, uniq;
