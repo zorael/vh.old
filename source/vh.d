@@ -233,8 +233,6 @@ size_t longestFilenameLength(FileHead[] fileheads) pure @nogc
 
 string withoutDotSlash(const string filename) pure @nogc
 {
-	debug assert((filename.length > 2), "Unexpected filename length: %d"
-								  .format(filename.length));
 	return (filename[0..2] == "./") ? filename[2..$] : filename;
 }
 
