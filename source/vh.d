@@ -246,7 +246,7 @@ void present(VerboseHeadResults res)
 	}
 
 	size_t longestLength = res.allFiles.longestFilenameLength;
-	immutable pattern = " %%-%ds %%d: %%s".format(longestLength);
+	immutable pattern = " %%-%ds %%d: %%s".format(longestLength+1);
 
 	static bool headSortPred(FileHead a, FileHead b)
 	{
@@ -308,7 +308,7 @@ void present(VerboseHeadResults res)
 			immutable linesTruncated = (fileline.linecount - linesConsumed);
 			immutable linecountPattern =
 				format!" %%-%ds [%%d %s truncated]"
-				(longestLength, linesTruncated.plurality("line", "lines"));
+				(longestLength+1, linesTruncated.plurality("line", "lines"));
 			writefln(linecountPattern, string.init, linesTruncated);
 		}
 	}
