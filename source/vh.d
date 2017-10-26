@@ -54,7 +54,7 @@ void main(string[] args)
 {
 	import std.file : dirEntries, SpanMode;
 	import std.path : exists, isDir, isFile;
-	import std.algorithm : uniq;
+	import std.algorithm : sort, uniq;
 
 	string[] paths = (args.length > 1) ? args[1..$] : [ "." ];
 	string[] files;
@@ -66,7 +66,7 @@ void main(string[] args)
 
 	Context ctx;
 
-	foreach (path; paths.uniq)
+	foreach (path; paths.sort.uniq)
 	{
 		if (!path.exists)
 		{
