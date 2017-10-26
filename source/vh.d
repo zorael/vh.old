@@ -51,6 +51,7 @@ void main(string[] args)
 {
 	import std.file : dirEntries, SpanMode;
 	import std.path : exists, isDir, isFile;
+	import std.algorithm : uniq;
 
 	string[] paths = (args.length > 1) ? args[1..$] : [ "." ];
 	string[] files;
@@ -62,7 +63,7 @@ void main(string[] args)
 
 	VerboseHeadResults res;
 
-	foreach (path; paths)
+	foreach (path; paths.uniq)
 	{
 		if (!path.exists)
 		{
