@@ -265,7 +265,7 @@ void present(VerboseHeadResults res)
 		}
 	}
 
-	import std.algorithm : sort, SwapStrategy;
+	import std.algorithm : sort, SwapStrategy, uniq;
 
 	foreach (fileline; res.allFiles.sort!(headSortPred, SwapStrategy.stable))
 	{
