@@ -38,14 +38,11 @@ struct FileHead
 		return (this.filename == that.filename);
 	}
 
-	this(string[] filelines)
+	this(const string filename, const size_t linecount, string[] lines)
 	{
-		filename = filelines[0];
-
-		if (filelines.length > 1)
-		{
-			lines = filelines[1..$];
-		}
+		this.filename = filename;
+		this.linecount = linecount;
+		this.lines = lines;
 	}
 }
 
@@ -183,9 +180,6 @@ void gather(T)(T lines, const string filename, ref Context ctx)
 	import std.array : Appender;
 	import std.range : take;
 
-	FileHead head;
-	head.filename = filename;
-
 	Appender!(string[]) sink;
 
 	foreach (line; lines.take(numberOfLines))
@@ -212,9 +206,7 @@ void gather(T)(T lines, const string filename, ref Context ctx)
 		++linecount;
 	}
 
-	head.linecount = linecount;
-	head.lines = sink.data;
-	ctx.allFiles ~= head;
+	ctx.files ~= FileHead(filename, linecount, sink.data);
 }
 
 
