@@ -84,22 +84,26 @@ void main(string[] args)
 
 				if (!isNormalFile(entry.name) || !entry.name.canBeRead)
 				{
+					// not a file or reading threw exception
 					++ctx.skippedFiles;
 					continue;
 				}
 
 				files ~= entry.name;
+				write(".");
 			}
 		}
 		else if (path.isFile)
 		{
 			if (!isNormalFile(path) || !path.canBeRead)
 			{
+				// not a file or reading threw exception
 				++ctx.skippedFiles;
 				continue;
 			}
 
 			files ~= path;
+			write(".");
 		}
 		else
 		{
@@ -108,8 +112,6 @@ void main(string[] args)
 			++ctx.skippedFiles;
 			continue;
 		}
-
-		write(".");
 	}
 
 	foreach (filename; files)
