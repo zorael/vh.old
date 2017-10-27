@@ -89,22 +89,14 @@ void main(string[] args)
 				write(".");
 			}
 		}
-		else if (path.isFile)
+		else if (path.isNormalFile && path.canBeRead)
 		{
-			if (!isNormalFile(path) || !path.canBeRead)
-			{
-				// not a file or reading threw exception
-				++ctx.skippedFiles;
-				continue;
-			}
-
 			files ~= path;
 			write(".");
 		}
 		else
 		{
-			writeln();
-			writeln("don't understand ", path);
+			// not a normal file (FIFO etc) or reading threw exception
 			++ctx.skippedFiles;
 			continue;
 		}
