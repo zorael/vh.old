@@ -118,9 +118,7 @@ void main(string[] args)
 	{
 		auto file = File(filename, "r");
 
-		file
-			.byLineCopy
-			.gather(filename, ctx);
+		file.byLineCopy.gather(filename, ctx);
 	}
 
 	writeln();
