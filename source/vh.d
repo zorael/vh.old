@@ -198,7 +198,7 @@ void gather(T)(T lines, const string filename, ref Context ctx)
 }
 
 
-size_t longestFilenameLength(const FileHead[] fileheads) pure @nogc
+size_t longestFilenameLength(const FileHead[] fileheads) pure @nogc nothrow
 {
     size_t longest;
 
@@ -212,7 +212,7 @@ size_t longestFilenameLength(const FileHead[] fileheads) pure @nogc
 }
 
 
-string withoutDotSlash(const string filename) pure @nogc
+string withoutDotSlash(const string filename) pure @nogc nothrow
 {
     assert((filename.length > 2), filename);
     version(Posix)
