@@ -33,11 +33,6 @@ struct FileHead
 		return !lines.length;
 	}
 
-	bool opEquals(FileHead that)
-	{
-		return (this.filename == that.filename);
-	}
-
 	this(const string filename, const size_t linecount, string[] lines)
 	{
 		this.filename = filename;
