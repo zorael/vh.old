@@ -107,9 +107,7 @@ void main(string[] args)
 
     foreach (filename; files)
     {
-        auto file = File(filename, "r");
-
-        file.byLineCopy.gather(filename, ctx);
+        File(filename, "r").byLineCopy.gather(filename, ctx);
     }
 
     writeln();
