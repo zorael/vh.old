@@ -403,6 +403,26 @@ string withoutDotSlash(const string filename) pure @nogc nothrow
     else assert(0, "Unknown platform");
 }
 
+unittest
+{
+    {
+        immutable without = "./herp".withoutDotSlash;
+        assert((without == "herp"), without);
+    }
+    {
+        immutable without = "./subdir/thing".withoutDotSlash;
+        assert((without == "subdir/thing"), without);
+    }
+    {
+        immutable without = "basename".withoutDotSlash;
+        assert((without == "basename"), without);
+    }
+    {
+        immutable without = "./.".withoutDotSlash;
+        assert((without == "."), without);
+    }
+}
+
 
 string plurality(ptrdiff_t num, string singular, string plural) pure @nogc nothrow
 {
