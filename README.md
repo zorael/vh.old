@@ -33,7 +33,7 @@ The tests are run at the *start* of the program, not during compilation.
 
 ## How to use
 
-Merely place the `vh` executable somewhere in your PATH, and execute it as normal. Alternatively for fast tests after changes to the source, you can use `dub run`.
+Merely place the `vh` executable somewhere in your `PATH`, and execute it as normal. Alternatively for fast tests after changes to the source, you can use `dub run`.
 
 ## TODO
 * add unit tests

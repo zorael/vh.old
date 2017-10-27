@@ -41,9 +41,7 @@ void main(string[] args)
         {
             immutable usageString = header ~
                 "\nusage: %s [options] [files|dirs] ...\n".format(args[0]);
-
-            defaultGetoptPrinter(usageString,
-                helpInformation.options);
+            defaultGetoptPrinter(usageString, helpInformation.options);
             return;
         }
     }
@@ -71,6 +69,7 @@ struct Context
     struct Settings
     {
         enum ColourSetting { off, auto_, always }
+
         ColourSetting colourSetting = ColourSetting.auto_;
         bool showHidden = true;
         uint lines = 3;
@@ -340,7 +339,7 @@ bool isNormalFile(const string filename, Context.Settings settings)
             /* FILE_ATTRIBUTE_{DIRECTORY,COMPRESSED,DEVICE,ENCRYPTED,HIDDEN,
                                NORMAL,NOT_CONTENT_INDEXED,OFFLINE,READONLY,
                                REPARSE_POINT,SPARSE_FILE,SYSTEM,TEMPORARY,
-                               VALID_FLAGS,VALID_SET_FLAGS}*/
+                               VALID_FLAGS,VALID_SET_FLAGS} */
 
             auto attr = getAttributes(filename);
 
@@ -458,7 +457,8 @@ void cycleBashColours()
 
     alias F = BashForeground;
 
-    static immutable colours = [
+    static immutable colours =
+    [
         F.red,
         F.green,
         F.yellow,
