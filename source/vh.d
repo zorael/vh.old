@@ -80,15 +80,17 @@ void main(string[] args)
                     continue;
                 }
 
-                if (!isNormalFile(entry.name) || !entry.name.canBeRead)
+                if (entry.name.isNormalFile && entry.name.canBeRead)
                 {
-                    // not a file or reading threw exception
+                    files ~= entry.name;
+                    write(".");
+                }
+                else
+                {
+                    // not a normal file (FIFO etc) or reading threw exception
                     ++ctx.skippedFiles;
-                    continue;
                 }
 
-                files ~= entry.name;
-                write(".");
             }
         }
         else if (path.isNormalFile && path.canBeRead)
@@ -98,9 +100,8 @@ void main(string[] args)
         }
         else
         {
-            // not a normal file (FIFO etc) or reading threw exception
+            // ditto
             ++ctx.skippedFiles;
-            continue;
         }
     }
 
