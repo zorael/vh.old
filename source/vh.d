@@ -215,7 +215,15 @@ size_t longestFilenameLength(const FileHead[] fileheads) pure @nogc
 string withoutDotSlash(const string filename) pure @nogc
 {
     assert((filename.length > 2), filename);
-    return (filename[0..2] == "./") ? filename[2..$] : filename;
+    version(Posix)
+    {
+        return (filename[0..2] == "./") ? filename[2..$] : filename;
+    }
+    else version(Windows)
+    {
+        return (filename[0..2] == `.\`) ? filename[2..$] : filename;
+    }
+    else assert(0, "Unknown platform");
 }
 
 
