@@ -5,6 +5,12 @@ import bash;
 import std.format : format;
 import std.stdio;
 
+enum VHInfo
+{
+    version_ = "0.4.5",
+    built = __TIMESTAMP__,
+    source = "https://github.com/zorael/vh"
+}
 
 enum numberOfLines = 3;
 enum bashResetToken = "%s[%dm".format(BashColourToken, BashReset.all);
@@ -75,6 +81,23 @@ struct FileHead
 }
 
 
+string header()
+{
+    import std.array : Appender;
+    Appender!string sink;
+    sink.reserve(256);
+
+    with (VHInfo)
+    {
+        sink.put("verbose head v%s, built %s\n"
+                 .format(cast(string)version_, cast(string)built));
+        sink.put("$ git clone %s\n".format(cast(string)source));
+    }
+
+    return sink.data;
+}
+
+
 void main(string[] args)
 {
     import std.getopt;
@@ -92,7 +115,10 @@ void main(string[] args)
 
         if (helpInformation.helpWanted)
         {
-            defaultGetoptPrinter("Some information about the program.",
+            immutable usageString = header ~
+                "\nusage: %s [options] [files|dirs] ...\n".format(args[0]);
+
+            defaultGetoptPrinter(usageString,
                 helpInformation.options);
             return;
         }
