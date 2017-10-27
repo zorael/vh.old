@@ -12,7 +12,6 @@ enum VHInfo
     source = "https://github.com/zorael/vh"
 }
 
-enum numberOfLines = 3;
 enum bashResetToken = "%s[%dm".format(BashColourToken, BashReset.all);
 
 
@@ -27,6 +26,7 @@ struct Context
         enum ColourSetting { off, auto_, always }
         ColourSetting colourSetting = ColourSetting.auto_;
         bool showHidden;
+        uint lines = 3;
 
         void colourSettingString(string nil, string option)
         {
@@ -107,6 +107,9 @@ void main(string[] args)
     try
     {
         auto helpInformation = getopt(args,
+            config.stopOnFirstNonOption,
+            "lines|n", "Number of lines to display",
+                &ctx.settings.lines,
             "colour", "Display with Bash colouring [off|auto|always]",
                 &ctx.settings.colourSettingString,
             "hidden|a", "Display hidden files",
@@ -254,7 +257,7 @@ void gather(T)(T lines, const string filename, ref Context ctx)
 
     Appender!(string[]) sink;
 
-    foreach (line; lines.take(numberOfLines))
+    foreach (line; lines.take(ctx.settings.lines))
     {
         import std.utf : UTFException, validate;
 
