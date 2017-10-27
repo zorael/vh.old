@@ -5,6 +5,7 @@ import bash;
 import std.format : format;
 import std.stdio;
 
+
 enum VHInfo
 {
     version_ = "0.4.5",
@@ -12,7 +13,48 @@ enum VHInfo
     source = "https://github.com/zorael/vh"
 }
 
-enum bashResetToken = "%s[%dm".format(BashColourToken, BashReset.all);
+
+void main(string[] args)
+{
+    import std.getopt;
+
+    Context ctx;
+
+    try
+    {
+        auto helpInformation = getopt(args,
+            config.stopOnFirstNonOption,
+            "lines|n", "Number of lines to display",
+                &ctx.settings.lines,
+            "colour", "Display with Bash colouring [off|auto|always]",
+                &ctx.settings.colourSettingString,
+            "hidden|a", "Display hidden files",
+                &ctx.settings.showHidden,
+        );
+
+        if (helpInformation.helpWanted)
+        {
+            immutable usageString = header ~
+                "\nusage: %s [options] [files|dirs] ...\n".format(args[0]);
+
+            defaultGetoptPrinter(usageString,
+                helpInformation.options);
+            return;
+        }
+    }
+    catch (Exception e)
+    {
+        writeln("Error: ", e.msg);
+        writeln("--help displays help screen.");
+        return;
+    }
+
+    string[] paths = (args.length > 1) ? args[1..$] : [ "." ];
+
+    ctx.populate(paths);
+    writeln();
+    ctx.present();
+}
 
 
 struct Context
@@ -92,65 +134,6 @@ struct FileHead
 }
 
 
-string header()
-{
-    import std.array : Appender;
-    Appender!string sink;
-    sink.reserve(256);
-
-    with (VHInfo)
-    {
-        sink.put("verbose head v%s, built %s\n"
-                 .format(cast(string)version_, cast(string)built));
-        sink.put("$ git clone %s\n".format(cast(string)source));
-    }
-
-    return sink.data;
-}
-
-
-void main(string[] args)
-{
-    import std.getopt;
-
-    Context ctx;
-
-    try
-    {
-        auto helpInformation = getopt(args,
-            config.stopOnFirstNonOption,
-            "lines|n", "Number of lines to display",
-                &ctx.settings.lines,
-            "colour", "Display with Bash colouring [off|auto|always]",
-                &ctx.settings.colourSettingString,
-            "hidden|a", "Display hidden files",
-                &ctx.settings.showHidden,
-        );
-
-        if (helpInformation.helpWanted)
-        {
-            immutable usageString = header ~
-                "\nusage: %s [options] [files|dirs] ...\n".format(args[0]);
-
-            defaultGetoptPrinter(usageString,
-                helpInformation.options);
-            return;
-        }
-    }
-    catch (Exception e)
-    {
-        writeln("Error: ", e.msg);
-        writeln("--help displays help screen.");
-        return;
-    }
-
-    string[] paths = (args.length > 1) ? args[1..$] : [ "." ];
-
-    ctx.populate(paths);
-    writeln();
-    ctx.present();
-}
-
 void populate(ref Context ctx, string[] paths)
 {
     import std.algorithm.sorting : sort;
@@ -214,67 +197,6 @@ void populate(ref Context ctx, string[] paths)
 }
 
 
-bool canBeRead(const string filename)
-{
-    try File(filename, "r");
-    catch (Exception e)
-    {
-        return false;
-    }
-
-    return true;
-}
-
-
-bool isNormalFile(const string filename, Context.Settings settings)
-{
-    import std.file : getAttributes, isFile;
-
-    try
-    {
-        version(Posix)
-        {
-            import core.sys.posix.sys.stat : S_IFBLK, S_IFCHR, S_IFIFO;
-            import std.path : baseName;
-
-            if (!settings.showHidden && (filename.baseName[0] == '.'))
-            {
-                return false;
-            }
-
-            return filename.isFile &&
-                !(getAttributes(filename) & (S_IFBLK | S_IFCHR | S_IFIFO));
-        }
-        else version(Windows)
-        {
-            import core.sys.windows.windows;
-
-            /* FILE_ATTRIBUTE_{DIRECTORY,COMPRESSED,DEVICE,ENCRYPTED,HIDDEN,
-                               NORMAL,NOT_CONTENT_INDEXED,OFFLINE,READONLY,
-                               REPARSE_POINT,SPARSE_FILE,SYSTEM,TEMPORARY,
-                               VALID_FLAGS,VALID_SET_FLAGS}*/
-
-            auto attr = getAttributes(filename);
-
-            if (!settings.showHidden && (attr & FILE_ATTRIBUTE_HIDDEN))
-            {
-                return false;
-            }
-
-            return filename.isFile &&
-                !(attr & (FILE_ATTRIBUTE_DEVICE | FILE_ATTRIBUTE_SYSTEM));
-        }
-        else assert(0, "Unknown platform");
-    }
-    catch (Exception e)
-    {
-        writeln();
-        writeln(e.msg);
-        return false;
-    }
-}
-
-
 void gather(T)(T lines, const string filename, ref Context ctx)
 {
     import std.array : Appender;
@@ -307,35 +229,6 @@ void gather(T)(T lines, const string filename, ref Context ctx)
     }
 
     ctx.files ~= FileHead(filename, linecount, sink.data);
-}
-
-
-size_t longestFilenameLength(const FileHead[] fileheads) pure @nogc nothrow
-{
-    size_t longest;
-
-    foreach (filehead; fileheads)
-    {
-        immutable dotlessLength = filehead.filename.withoutDotSlash.length;
-        longest = (dotlessLength > longest) ? dotlessLength : longest;
-    }
-
-    return longest;
-}
-
-
-string withoutDotSlash(const string filename) pure @nogc nothrow
-{
-    assert((filename.length > 2), filename);
-    version(Posix)
-    {
-        return (filename[0..2] == "./") ? filename[2..$] : filename;
-    }
-    else version(Windows)
-    {
-        return (filename[0..2] == `.\`) ? filename[2..$] : filename;
-    }
-    else assert(0, "Unknown platform");
 }
 
 
@@ -411,6 +304,102 @@ void present(Context ctx)
 }
 
 
+bool isNormalFile(const string filename, Context.Settings settings)
+{
+    import std.file : getAttributes, isFile;
+
+    try
+    {
+        version(Posix)
+        {
+            import core.sys.posix.sys.stat : S_IFBLK, S_IFCHR, S_IFIFO;
+            import std.path : baseName;
+
+            if (!settings.showHidden && (filename.baseName[0] == '.'))
+            {
+                return false;
+            }
+
+            return filename.isFile &&
+                !(getAttributes(filename) & (S_IFBLK | S_IFCHR | S_IFIFO));
+        }
+        else version(Windows)
+        {
+            import core.sys.windows.windows;
+
+            /* FILE_ATTRIBUTE_{DIRECTORY,COMPRESSED,DEVICE,ENCRYPTED,HIDDEN,
+                               NORMAL,NOT_CONTENT_INDEXED,OFFLINE,READONLY,
+                               REPARSE_POINT,SPARSE_FILE,SYSTEM,TEMPORARY,
+                               VALID_FLAGS,VALID_SET_FLAGS}*/
+
+            auto attr = getAttributes(filename);
+
+            if (!settings.showHidden && (attr & FILE_ATTRIBUTE_HIDDEN))
+            {
+                return false;
+            }
+
+            return filename.isFile &&
+                !(attr & (FILE_ATTRIBUTE_DEVICE | FILE_ATTRIBUTE_SYSTEM));
+        }
+        else assert(0, "Unknown platform");
+    }
+    catch (Exception e)
+    {
+        writeln();
+        writeln(e.msg);
+        return false;
+    }
+}
+
+
+bool canBeRead(const string filename)
+{
+    try File(filename, "r");
+    catch (Exception e)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+
+size_t longestFilenameLength(const FileHead[] fileheads) pure @nogc nothrow
+{
+    size_t longest;
+
+    foreach (filehead; fileheads)
+    {
+        immutable dotlessLength = filehead.filename.withoutDotSlash.length;
+        longest = (dotlessLength > longest) ? dotlessLength : longest;
+    }
+
+    return longest;
+}
+
+
+string withoutDotSlash(const string filename) pure @nogc nothrow
+{
+    assert((filename.length > 2), filename);
+    version(Posix)
+    {
+        return (filename[0..2] == "./") ? filename[2..$] : filename;
+    }
+    else version(Windows)
+    {
+        return (filename[0..2] == `.\`) ? filename[2..$] : filename;
+    }
+    else assert(0, "Unknown platform");
+}
+
+
+string plurality(ptrdiff_t num, string singular, string plural) pure @nogc nothrow
+{
+    return ((num == 1) || (num == -1)) ? singular : plural;
+}
+
+
 void cycleBashColours()
 {
     import std.concurrency : yield;
@@ -444,8 +433,21 @@ void cycleBashColours()
 }
 
 
-string plurality(ptrdiff_t num, string singular, string plural) pure @nogc nothrow
+string header()
 {
-    return ((num == 1) || (num == -1)) ? singular : plural;
+    import std.array : Appender;
+    Appender!string sink;
+    sink.reserve(128);  // usually 91 characters
+
+    with (VHInfo)
+    {
+        sink.put("verbose head v%s, built %s\n"
+                 .format(cast(string)version_, cast(string)built));
+        sink.put("$ git clone %s\n".format(cast(string)source));
+    }
+
+    return sink.data;
 }
 
+
+enum bashResetToken = "%s[%dm".format(BashColourToken, BashReset.all);
