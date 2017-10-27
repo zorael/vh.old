@@ -123,11 +123,6 @@ struct FileHead
     size_t linecount;
     string[] lines;
 
-    bool empty()
-    {
-        return !lines.length;
-    }
-
     this(const string filename, const size_t linecount, string[] lines)
     {
         assert((filename.length), filename);
@@ -265,8 +260,9 @@ void present(Context ctx)
         }
 
         size_t linesConsumed;
+        bool printedLines;
 
-        if (filehead.empty)
+        if (!filehead.linecount)
         {
             writefln(pattern, filehead.filename.withoutDotSlash,
                      0, bashResetToken ~ "< empty >");
@@ -285,19 +281,28 @@ void present(Context ctx)
                 writefln(pattern, string.init, lineNumber+1, line);
             }
 
+            printedLines = true;
             ++linesConsumed;
         }
 
         if (filehead.linecount > linesConsumed)
         {
-            if (ctx.settings.useColours) write(bashResetToken);
 
             immutable linesTruncated = (filehead.linecount - linesConsumed);
-            immutable linecountPattern =
-                format!" %%-%ds  [%%d %s truncated]"
-                (longestLength, linesTruncated.plurality("line", "lines"));
+            immutable truncatedPattern =
+                    format!" %%-%ds%s  [%%d %s truncated]"
+                    (longestLength, bashResetToken, linesTruncated.plurality("line", "lines"));
 
-            writefln(linecountPattern, string.init, linesTruncated);
+            if (printedLines)
+            {
+                writefln(truncatedPattern, string.init, string.init,
+                         linesTruncated);
+            }
+            else
+            {
+                writefln(truncatedPattern, filehead.filename.withoutDotSlash,
+                         linesTruncated);
+            }
         }
     }
 
