@@ -482,6 +482,42 @@ void cycleBashColours()
     }
 }
 
+unittest
+{
+    import std.concurrency : Generator;
+
+    alias F = BashForeground;
+
+    static immutable colours =
+    [
+        F.red,
+        F.green,
+        F.yellow,
+        F.blue,
+        F.magenta,
+        F.cyan,
+        F.lightgrey,
+        F.darkgrey,
+        F.lightred,
+        F.lightgreen,
+        F.lightyellow,
+        F.lightblue,
+        F.lightmagenta,
+        F.lightcyan,
+        F.white,
+    ];
+
+    auto colourGenerator = new Generator!string(&cycleBashColours);
+
+    foreach (i, colour; colours)
+    {
+        immutable code = "%s[%d;%dm".format(BashColourToken, BashFormat.bright,
+            cast(size_t)colour);
+        assert(colourGenerator.front == code);
+        colourGenerator.popFront();
+    }
+}
+
 
 string header()
 {
