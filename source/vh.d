@@ -429,6 +429,26 @@ string plurality(ptrdiff_t num, string singular, string plural) pure @nogc nothr
     return ((num == 1) || (num == -1)) ? singular : plural;
 }
 
+unittest
+{
+    {
+        immutable singular = 1.plurality("cat", "cats");
+        assert((singular == "cat"), singular);
+    }
+    {
+        immutable singular = (-5).plurality("dog", "dogs");
+        assert((singular == "dogs"), singular);
+    }
+    {
+        immutable plural = 0.plurality("banana", "bananas");
+        assert((plural == "bananas"), plural);
+    }
+    {
+        immutable plural = 999.plurality("", "");
+        assert((plural == ""), plural);
+    }
+}
+
 
 void cycleBashColours()
 {
