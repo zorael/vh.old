@@ -33,7 +33,7 @@ struct FileHead
 		return !lines.length;
 	}
 
-	bool opEquals(T)(T that)
+	bool opEquals(FileHead that)
 	{
 		return (this.filename == that.filename);
 	}
