@@ -294,8 +294,7 @@ void present(Context ctx)
 
             if (printedLines)
             {
-                writefln(truncatedPattern, string.init, string.init,
-                         linesTruncated);
+                writefln(truncatedPattern, string.init, linesTruncated);
             }
             else
             {
