@@ -296,7 +296,7 @@ void present(Context ctx)
         }
     }
 
-    writeln(bashResetToken);
+    if (ctx.settings.useColours) writeln(bashResetToken);
     writefln("%d %s listed, with %d %s and %d %s skipped",
         ctx.files.length, ctx.files.length.plurality("file", "files"),
         ctx.skippedFiles, ctx.skippedFiles.plurality("file", "files"),
