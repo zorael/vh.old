@@ -129,13 +129,21 @@ bool canBeRead(const string filename)
 
 bool isNormalFile(const string filename)
 {
-    import core.sys.posix.sys.stat : S_IFBLK, S_IFCHR, S_IFIFO;
     import std.file : getAttributes, isFile;
 
     try
     {
-        return filename.isFile &&
-            (!(getAttributes(filename) & (S_IFBLK | S_IFCHR | S_IFIFO)));
+        version(Posix)
+        {
+            import core.sys.posix.sys.stat : S_IFBLK, S_IFCHR, S_IFIFO;
+            return filename.isFile &&
+                (!(getAttributes(filename) & (S_IFBLK | S_IFCHR | S_IFIFO)));
+        }
+        else version(Windows)
+        {
+            // TODO: Add Windows support
+        }
+        else assert(0, "Unknown platform");
     }
     catch (Exception e)
     {
