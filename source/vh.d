@@ -77,11 +77,34 @@ struct FileHead
 
 void main(string[] args)
 {
-    string[] paths = (args.length > 1) ? args[1..$] : [ "." ];
-
-    version(Colour) write(bashResetToken);
+    import std.getopt;
 
     Context ctx;
+
+    try
+    {
+        auto helpInformation = getopt(args,
+            "colour", "Display with Bash colouring [off|auto|always]",
+                &ctx.settings.colourSettingString,
+            "hidden|a", "Display hidden files",
+                &ctx.settings.showHidden,
+        );
+
+        if (helpInformation.helpWanted)
+        {
+            defaultGetoptPrinter("Some information about the program.",
+                helpInformation.options);
+            return;
+        }
+    }
+    catch (Exception e)
+    {
+        writeln(e.msg);
+        return;
+    }
+
+    string[] paths = (args.length > 1) ? args[1..$] : [ "." ];
+
     ctx.populate(paths);
     writeln();
     ctx.present();
