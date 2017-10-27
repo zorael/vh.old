@@ -59,7 +59,7 @@ void populate(ref Context ctx, string[] paths)
     import std.file : dirEntries, SpanMode;
     import std.path : exists, isDir, isFile;
 
-    string[] files;
+    string[] filelist;
 
     foreach (path; paths.sort().uniq)
     {
@@ -85,7 +85,7 @@ void populate(ref Context ctx, string[] paths)
 
                 if (entry.name.isNormalFile && entry.name.canBeRead)
                 {
-                    files ~= entry.name;
+                    filelist ~= entry.name;
                     write(".");
                 }
                 else
@@ -98,7 +98,7 @@ void populate(ref Context ctx, string[] paths)
         }
         else if (path.isNormalFile && path.canBeRead)
         {
-            files ~= path;
+            filelist ~= path;
             write(".");
         }
         else
@@ -108,7 +108,7 @@ void populate(ref Context ctx, string[] paths)
         }
     }
 
-    foreach (filename; files)
+    foreach (filename; filelist)
     {
         File(filename, "r").byLineCopy.gather(filename, ctx);
     }
