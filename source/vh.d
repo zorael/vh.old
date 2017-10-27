@@ -219,14 +219,11 @@ void present(Context ctx)
 	size_t longestLength = ctx.files.longestFilenameLength;
 	immutable pattern = " %%-%ds  %%d: %%s".format(longestLength);
 
-	static bool headSortPred(FileHead a, FileHead b)
-	{
-		return a.filename == b.filename;
-	}
+	auto uniqueFiles = ctx.files
+		.sort!((a,b) => (a.filename < b.filename), SwapStrategy.stable)
+		.uniq;
 
-	import std.algorithm : sort, SwapStrategy, uniq;
-
-	foreach (fileline; ctx.files.sort!(headSortPred, SwapStrategy.stable).uniq)
+	foreach (filehead; uniqueFiles)
 	{
 		import std.path : baseName;
 
@@ -238,16 +235,18 @@ void present(Context ctx)
 
 		size_t linesConsumed;
 
-		if (fileline.empty)
+		if (filehead.empty)
 		{
-			writefln(pattern, fileline.filename, 0, "< empty >");
+			writefln(pattern, filehead.filename, 0, bashResetToken ~ "< empty >");
+			continue;
 		}
-		else foreach (lineNumber, line; fileline.lines)
+
+		foreach (immutable lineNumber, line; filehead.lines)
 		{
 			if (lineNumber == 0)
 			{
-				writefln(pattern, fileline.filename.withoutDotSlash,
-						 lineNumber+1, line);
+				writefln(pattern, filehead.filename.withoutDotSlash,
+						lineNumber+1, line);
 			}
 			else
 			{
@@ -257,14 +256,15 @@ void present(Context ctx)
 			++linesConsumed;
 		}
 
-		if (fileline.linecount > linesConsumed)
+		if (filehead.linecount > linesConsumed)
 		{
 			version(Colour) write(bashResetToken);
 
-			immutable linesTruncated = (fileline.linecount - linesConsumed);
+			immutable linesTruncated = (filehead.linecount - linesConsumed);
 			immutable linecountPattern =
 				format!" %%-%ds  [%%d %s truncated]"
 				(longestLength, linesTruncated.plurality("line", "lines"));
+
 			writefln(linecountPattern, string.init, linesTruncated);
 		}
 	}
