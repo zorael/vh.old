@@ -138,38 +138,22 @@ bool canBeRead(string filename)
 	return true;
 }
 
+
 bool isNormalFile(const string filename)
 {
-	return DirEntry(filename).isNormalFile();
-}
-
-bool isNormalFile(DirEntry entry)
-{
 	import core.sys.posix.sys.stat;
-	import std.path : isFile, DirEntry;
-
-	if (!entry.isFile) return false;
+	import std.file;
 
 	try
 	{
-		const stat = entry.statBuf.st_mode;
-
-		if ((stat & S_IFIFO) ||
-			(stat & S_IFCHR) ||
-			(stat & S_IFBLK))
-		{
-			// Either a FIFO, a character file or a block file
-			return false;
-		}
+		return (!(getAttributes(filename) & (S_IFIFO | S_IFCHR | S_IFBLK)));
 	}
 	catch (Exception e)
 	{
-		// object.Exception@std/file.d(3216): Failed to stat file `./rcmysql'
-		// (broken link)
+		writeln();
+		writeln(e.msg);
 		return false;
 	}
-
-	return true;
 }
 
 
