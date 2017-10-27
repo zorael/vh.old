@@ -5,10 +5,6 @@ import bash;
 import std.format : format;
 import std.stdio;
 
-version(Posix)
-{
-    version = Colour;
-}
 
 enum numberOfLines = 3;
 enum bashResetToken = "%s[%dm".format(BashColourToken, BashReset.all);
