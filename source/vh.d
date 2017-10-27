@@ -222,7 +222,7 @@ void present(Context ctx)
 	}
 
 	size_t longestLength = ctx.files.longestFilenameLength;
-	immutable pattern = " %%-%ds %%d: %%s".format(longestLength+1);
+	immutable pattern = " %%-%ds  %%d: %%s".format(longestLength);
 
 	static bool headSortPred(FileHead a, FileHead b)
 	{
@@ -268,8 +268,8 @@ void present(Context ctx)
 
 			immutable linesTruncated = (fileline.linecount - linesConsumed);
 			immutable linecountPattern =
-				format!" %%-%ds [%%d %s truncated]"
-				(longestLength+1, linesTruncated.plurality("line", "lines"));
+				format!" %%-%ds  [%%d %s truncated]"
+				(longestLength, linesTruncated.plurality("line", "lines"));
 			writefln(linecountPattern, string.init, linesTruncated);
 		}
 	}
