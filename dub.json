@@ -26,6 +26,11 @@
         },
         {
             "name": "monochrome"
+        },
+        {
+            "name": "unittest",
+            "buildType": "unittest",
+            "versions": [ "Colour" ]
         }
     ]
 }

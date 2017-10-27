@@ -13,7 +13,12 @@ enum VHInfo
     source = "https://github.com/zorael/vh"
 }
 
-
+version(unittest)
+void main()
+{
+    writeln("All tests completed successfully!");
+}
+else
 void main(string[] args)
 {
     import std.getopt;
