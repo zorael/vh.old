@@ -51,7 +51,18 @@ struct Context
         bool useColours()
         {
             with (ColourSetting)
-            return (colourSetting == always) || (colourSetting == auto_);
+            {
+                version(Posix)
+                {
+                    return (colourSetting == always) || (colourSetting == auto_);
+                }
+                else version(Windows)
+                {
+                    // auto means off in Windows
+                    return (colourSetting == always);
+                }
+                else assert(0, "Unknown platform");
+            }
         }
     }
 
