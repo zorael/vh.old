@@ -136,12 +136,21 @@ bool isNormalFile(const string filename)
         version(Posix)
         {
             import core.sys.posix.sys.stat : S_IFBLK, S_IFCHR, S_IFIFO;
+
             return filename.isFile &&
-                (!(getAttributes(filename) & (S_IFBLK | S_IFCHR | S_IFIFO)));
+                !(getAttributes(filename) & (S_IFBLK | S_IFCHR | S_IFIFO));
         }
         else version(Windows)
         {
-            // TODO: Add Windows support
+            import core.sys.windows.windows;
+
+            /* FILE_ATTRIBUTE_{DIRECTORY,COMPRESSED,DEVICE,ENCRYPTED,HIDDEN,
+                               NORMAL,NOT_CONTENT_INDEXED,OFFLINE,READONLY,
+                               REPARSE_POINT,SPARSE_FILE,SYSTEM,TEMPORARY,
+                               VALID_FLAGS,VALID_SET_FLAGS}*/
+
+            return filename.isFile && !(getAttributes(filename) &
+                (FILE_ATTRIBUTE_DEVICE | FILE_ATTRIBUTE_SYSTEM));
         }
         else assert(0, "Unknown platform");
     }
