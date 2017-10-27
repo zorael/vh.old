@@ -49,17 +49,14 @@ struct FileHead
 
 void main(string[] args)
 {
+	import std.algorithm : sort, uniq;
 	import std.file : dirEntries, SpanMode;
 	import std.path : exists, isDir, isFile;
-	import std.algorithm : sort, uniq;
 
 	string[] paths = (args.length > 1) ? args[1..$] : [ "." ];
 	string[] files;
 
-	version(Colour)
-	{
-		write(bashResetToken);
-	}
+	version(Colour) write(bashResetToken);
 
 	Context ctx;
 
@@ -67,6 +64,7 @@ void main(string[] args)
 	{
 		if (!path.exists)
 		{
+			writeln();
 			writeln(path, " does not exist");
 			continue;
 		}
@@ -281,10 +279,7 @@ void present(Context ctx)
 
 		if (fileline.linecount > linesConsumed)
 		{
-			version(Colour)
-			{
-				write(bashResetToken);
-			}
+			version(Colour) write(bashResetToken);
 
 			immutable linesTruncated = (fileline.linecount - linesConsumed);
 			immutable linecountPattern =
