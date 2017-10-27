@@ -2,9 +2,9 @@
 
 verbose head
 
-This tool acts like the terminal tool `head`, performed on all files in your current directory or one specified at the command-line. By default only the first three lines are shown (`head -n3 *`) and in colours, but this is compile-time configurable.
+This tool acts like the terminal tool `head`, performed on all files in your current directory or one paths specified on the command-line.
 
-Future improvements will include being able to specify more than one directory, getopt options and saved configuration files.
+By default only the first three lines are shown (`head -n3 .`), but this is configurable via a command-line switch `-n`. There is support for coloured output and on Posix systems this will default to enabled, whereas on Windows it defaults to off.
 
 ## Getting started
 
@@ -36,8 +36,8 @@ The tests are run at the *start* of the program, not during compilation.
 Merely place the `vh` executable somewhere in your PATH, and execute it as normal. Alternatively for fast tests after changes to the source, you can use `dub run`.
 
 ## TODO
-* getopt, move some compile-time options to runtime
-* multiple paths
+* add unit tests
+* code cleanup
 
 ## License
 This project is licensed under the **MIT License** see the [LICENSE](LICENSE) file for details.
