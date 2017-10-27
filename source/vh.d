@@ -116,9 +116,7 @@ void main(string[] args)
 
 bool canBeRead(const string filename)
 {
-	File file;
-
-	try file = File(filename, "r");
+	try File(filename, "r");
 	catch (Exception e)
 	{
 		return false;
