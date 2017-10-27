@@ -288,11 +288,13 @@ string withoutDotSlash(const string filename) pure @nogc nothrow
 void present(Context ctx)
 {
     import std.algorithm : SwapStrategy, uniq, sort;
+    import std.concurrency : Generator;
 
-    version(Colour)
+    Generator!string colourGenerator;
+
+    if (ctx.settings.useColours)
     {
-        import std.concurrency : Generator;
-        auto colourGenerator = new Generator!string(&cycleBashColours);
+        colourGenerator = new Generator!string(&cycleBashColours);
     }
 
     size_t longestLength = ctx.files.longestFilenameLength;
@@ -304,7 +306,7 @@ void present(Context ctx)
 
     foreach (filehead; uniqueFiles)
     {
-        version(Colour)
+        if (ctx.settings.useColours)
         {
             write(colourGenerator.front);
             colourGenerator.popFront();
@@ -336,7 +338,7 @@ void present(Context ctx)
 
         if (filehead.linecount > linesConsumed)
         {
-            version(Colour) write(bashResetToken);
+            if (ctx.settings.useColours) write(bashResetToken);
 
             immutable linesTruncated = (filehead.linecount - linesConsumed);
             immutable linecountPattern =
@@ -355,7 +357,6 @@ void present(Context ctx)
 }
 
 
-version(Colour)
 void cycleBashColours()
 {
     import std.concurrency : yield;
