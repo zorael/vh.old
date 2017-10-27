@@ -1,11 +1,11 @@
 {
-	"name": "vh",
-	"authors": [
-		"JR"
-	],
-	"description": "verbose head",
-	"copyright": "Copyright © 2017, JR",
-	"license": "MIT",
-	"targetType": "executable",
-	"mainSourceFile": "source/vh.d"
+    "name": "vh",
+    "authors": [
+        "JR"
+    ],
+    "description": "verbose head",
+    "copyright": "Copyright © 2017, JR",
+    "license": "MIT",
+    "targetType": "executable",
+    "mainSourceFile": "source/vh.d"
 }
