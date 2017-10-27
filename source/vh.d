@@ -1,9 +1,10 @@
 module vh;
 
 import bash;
-import std.stdio;
+
 import std.file : DirEntry;
 import std.format : format;
+import std.stdio;
 
 version(Posix)
 {
@@ -137,12 +138,13 @@ bool canBeRead(const string filename)
 
 bool isNormalFile(const string filename)
 {
-	import core.sys.posix.sys.stat;
-	import std.file;
+	import core.sys.posix.sys.stat : S_IFBLK, S_IFCHR, S_IFIFO;
+	import std.file : getAttributes, isFile;
 
 	try
 	{
-		return (!(getAttributes(filename) & (S_IFIFO | S_IFCHR | S_IFBLK)));
+		return filename.isFile &&
+			(!(getAttributes(filename) & (S_IFBLK | S_IFCHR | S_IFIFO)));
 	}
 	catch (Exception e)
 	{
@@ -162,7 +164,7 @@ void gather(T)(T lines, const string filename, ref Context ctx)
 
 	foreach (line; lines.take(numberOfLines))
 	{
-		import std.utf;
+		import std.utf : UTFException, validate;
 
 		try
 		{
@@ -204,19 +206,20 @@ size_t longestFilenameLength(const FileHead[] fileheads) pure @nogc
 
 string withoutDotSlash(const string filename) pure @nogc
 {
+	assert((filename.length > 2), filename);
 	return (filename[0..2] == "./") ? filename[2..$] : filename;
 }
 
 
 void present(Context ctx)
 {
+	import std.algorithm : SwapStrategy, uniq, sort;
+
 	version(Colour)
 	{
 		import std.concurrency : Generator;
 		auto colourGenerator = new Generator!string(&cycleBashColours);
 	}
-
-	import std.algorithm : sort, SwapStrategy, uniq;
 
 	size_t longestLength = ctx.files.longestFilenameLength;
 	immutable pattern = " %%-%ds  %%d: %%s".format(longestLength);
