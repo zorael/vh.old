@@ -528,7 +528,7 @@ string header()
     {
         sink.put("verbose head v%s, built %s\n"
                  .format(cast(string)version_, cast(string)built));
-        sink.put("$ git clone %s\n".format(cast(string)source));
+        sink.put("$ git clone %s.git\n".format(cast(string)source));
     }
 
     return sink.data;
