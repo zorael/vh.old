@@ -181,7 +181,7 @@ void populate(ref Context ctx, string[] paths)
                     continue;
                 }
 
-                if (entry.name.isNormalFile && entry.name.canBeRead)
+                if (entry.name.isNormalFile(ctx.settings) && entry.name.canBeRead)
                 {
                     filelist ~= entry.name;
                     write(".");
@@ -194,7 +194,7 @@ void populate(ref Context ctx, string[] paths)
 
             }
         }
-        else if (path.isNormalFile && path.canBeRead)
+        else if (path.isNormalFile(ctx.settings) && path.canBeRead)
         {
             filelist ~= path;
             write(".");
@@ -225,7 +225,7 @@ bool canBeRead(const string filename)
 }
 
 
-bool isNormalFile(const string filename)
+bool isNormalFile(const string filename, Context.Settings settings)
 {
     import std.file : getAttributes, isFile;
 
@@ -234,6 +234,12 @@ bool isNormalFile(const string filename)
         version(Posix)
         {
             import core.sys.posix.sys.stat : S_IFBLK, S_IFCHR, S_IFIFO;
+            import std.path : baseName;
+
+            if (!settings.showHidden && (filename.baseName[0] == '.'))
+            {
+                return false;
+            }
 
             return filename.isFile &&
                 !(getAttributes(filename) & (S_IFBLK | S_IFCHR | S_IFIFO));
@@ -247,8 +253,15 @@ bool isNormalFile(const string filename)
                                REPARSE_POINT,SPARSE_FILE,SYSTEM,TEMPORARY,
                                VALID_FLAGS,VALID_SET_FLAGS}*/
 
-            return filename.isFile && !(getAttributes(filename) &
-                (FILE_ATTRIBUTE_DEVICE | FILE_ATTRIBUTE_SYSTEM));
+            auto attr = getAttributes(filename);
+
+            if (!settings.showHidden && (attr & FILE_ATTRIBUTE_HIDDEN))
+            {
+                return false;
+            }
+
+            return filename.isFile &&
+                !(attr & (FILE_ATTRIBUTE_DEVICE | FILE_ATTRIBUTE_SYSTEM));
         }
         else assert(0, "Unknown platform");
     }
