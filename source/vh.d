@@ -125,7 +125,8 @@ void main(string[] args)
 	present(ctx);
 }
 
-bool canBeRead(string filename)
+
+bool canBeRead(const string filename)
 {
 	File file;
 
@@ -192,7 +193,7 @@ void gather(T)(T lines, const string filename, ref Context ctx)
 }
 
 
-size_t longestFilenameLength(FileHead[] fileheads) pure @nogc
+size_t longestFilenameLength(const FileHead[] fileheads) pure @nogc
 {
 	size_t longest;
 
@@ -315,7 +316,7 @@ void cycleBashColours()
 }
 
 
-string plurality(ptrdiff_t num, string singular, string plural) pure
+string plurality(ptrdiff_t num, string singular, string plural) pure @nogc nothrow
 {
 	return ((num == 1) || (num == -1)) ? singular : plural;
 }
