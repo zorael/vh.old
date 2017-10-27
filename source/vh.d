@@ -256,7 +256,8 @@ void present(Context ctx)
 
         if (filehead.empty)
         {
-            writefln(pattern, filehead.filename, 0, bashResetToken ~ "< empty >");
+            writefln(pattern, filehead.filename.withoutDotSlash,
+                     0, bashResetToken ~ "< empty >");
             continue;
         }
 
