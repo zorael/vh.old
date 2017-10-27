@@ -139,7 +139,8 @@ void main(string[] args)
     }
     catch (Exception e)
     {
-        writeln(e.msg);
+        writeln("Error: ", e.msg);
+        writeln("--help displays help screen.");
         return;
     }
 
