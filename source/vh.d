@@ -286,11 +286,11 @@ void present(Context ctx)
 
         if (filehead.linecount > linesConsumed)
         {
-
             immutable linesTruncated = (filehead.linecount - linesConsumed);
             immutable truncatedPattern =
                     format!" %%-%ds%s  [%%d %s truncated]"
-                    (longestLength, bashResetToken, linesTruncated.plurality("line", "lines"));
+                    (longestLength, bashResetToken,
+                    linesTruncated.plurality("line", "lines"));
 
             if (printedLines)
             {
