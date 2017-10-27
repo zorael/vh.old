@@ -15,6 +15,41 @@ struct Context
     FileHead[] files;
     size_t skippedFiles;
     size_t skippedDirs;
+
+    struct Settings
+    {
+        enum ColourSetting { off, auto_, always }
+        ColourSetting colourSetting = ColourSetting.auto_;
+        bool showHidden;
+
+        void colourSettingString(string nil, string option)
+        {
+            with (ColourSetting)
+            switch (option)
+            {
+            case "off":
+                colourSetting = off;
+                break;
+            case "auto":
+                colourSetting = auto_;
+                break;
+            case "always":
+                colourSetting = always;
+                break;
+            default:
+                writeln("Don't understand colour option ", option);
+                assert(0);
+            }
+        }
+
+        bool useColours()
+        {
+            with (ColourSetting)
+            return (colourSetting == always) || (colourSetting == auto_);
+        }
+    }
+
+    Settings settings;
 }
 
 
