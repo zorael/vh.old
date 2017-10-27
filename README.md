@@ -2,9 +2,9 @@
 
 verbose head
 
-This tool acts like the terminal tool `head`, performed on all files in your current directory or one paths specified on the command-line.
+This tool acts like the terminal tool `head`, verbosely performed on all files in your current directory or on paths specified on the command-line.
 
-By default only the first three lines are shown (`head -n3 .`), but this is configurable via a command-line switch `-n`. There is support for coloured output and on Posix systems this will default to enabled, whereas on Windows it defaults to off.
+By default only the first three lines are shown, as `head -n3 *` would have displayed, but the line count is configurable via command-line switches. There is support for coloured output and on Posix systems this will default to enabled, whereas on Windows it defaults to off. The behaviour can be overridden with the `--colour` switch.
 
 ## Getting started
 
