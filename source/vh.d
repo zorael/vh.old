@@ -2,7 +2,6 @@ module vh;
 
 import bash;
 
-import std.file : DirEntry;
 import std.format : format;
 import std.stdio;
 
