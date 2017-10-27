@@ -25,7 +25,7 @@ struct Context
     {
         enum ColourSetting { off, auto_, always }
         ColourSetting colourSetting = ColourSetting.auto_;
-        bool showHidden;
+        bool showHidden = true;
         uint lines = 3;
 
         void colourSettingString(string nil, string option)
