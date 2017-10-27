@@ -1,11 +1,31 @@
 {
     "name": "vh",
-    "authors": [
+    "authors":
+    [
         "JR"
     ],
     "description": "verbose head",
     "copyright": "Copyright © 2017, JR",
     "license": "MIT",
     "targetType": "executable",
-    "mainSourceFile": "source/vh.d"
+    "mainSourceFile": "source/vh.d",
+    "configurations":
+    [
+        {
+            "name": "windows",
+            "platforms": [ "windows" ]
+        },
+        {
+            "name": "posix",
+            "platforms": [ "posix" ],
+            "versions": [ "Colour" ]
+        },
+        {
+            "name": "colour",
+            "versions": [ "Colour" ]
+        },
+        {
+            "name": "monochrome"
+        }
+    ]
 }
