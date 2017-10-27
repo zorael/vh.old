@@ -42,18 +42,26 @@ struct FileHead
 
 void main(string[] args)
 {
-    import std.algorithm : sort, uniq;
-    import std.file : dirEntries, SpanMode;
-    import std.path : exists, isDir, isFile;
-
     string[] paths = (args.length > 1) ? args[1..$] : [ "." ];
-    string[] files;
 
     version(Colour) write(bashResetToken);
 
     Context ctx;
+    ctx.populate(paths);
+    writeln();
+    ctx.present();
+}
 
-    foreach (path; paths.sort.uniq)
+void populate(ref Context ctx, string[] paths)
+{
+    import std.algorithm.sorting : sort;
+    import std.algorithm.iteration : uniq;
+    import std.file : dirEntries, SpanMode;
+    import std.path : exists, isDir, isFile;
+
+    string[] files;
+
+    foreach (path; paths.sort().uniq)
     {
         if (!path.exists)
         {
@@ -104,9 +112,6 @@ void main(string[] args)
     {
         File(filename, "r").byLineCopy.gather(filename, ctx);
     }
-
-    writeln();
-    present(ctx);
 }
 
 
