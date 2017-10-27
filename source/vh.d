@@ -216,6 +216,8 @@ void present(Context ctx)
 		auto colourGenerator = new Generator!string(&cycleBashColours);
 	}
 
+	import std.algorithm : sort, SwapStrategy, uniq;
+
 	size_t longestLength = ctx.files.longestFilenameLength;
 	immutable pattern = " %%-%ds  %%d: %%s".format(longestLength);
 
@@ -225,8 +227,6 @@ void present(Context ctx)
 
 	foreach (filehead; uniqueFiles)
 	{
-		import std.path : baseName;
-
 		version(Colour)
 		{
 			write(colourGenerator.front);
