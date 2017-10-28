@@ -331,6 +331,12 @@ void process(Sink)(Context ctx, ref Sink sink)
         sink.put(bashResetToken);
     }
 
+    ctx.summarise(sink);
+}
+
+
+void summarise(Sink)(Context ctx, ref Sink sink)
+{
     sink.put("\n%d %s listed".format(ctx.files.length,
         ctx.files.length.plurality("file", "files")));
 
