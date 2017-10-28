@@ -45,10 +45,20 @@ void main(string[] args)
             return;
         }
     }
-    catch (Exception e)
+    catch (InvalidColourException e)
+    {
+        writeln(e.msg);
+        return;
+    }
+    catch (GetOptException e)
     {
         writeln("Error: ", e.msg);
-        writeln("--help displays help screen.");
+        writeln("--help displays the help screen.");
+        return;
+    }
+    catch (Exception e)
+    {
+        writeln(e.msg);
         return;
     }
 
@@ -89,8 +99,8 @@ struct Context
                 colourSetting = always;
                 break;
             default:
-                writeln("Don't understand colour option ", option);
-                assert(0);
+                throw new InvalidColourException(`Invalid colour: "%s"`
+                    .format(option));
             }
         }
 
@@ -531,6 +541,15 @@ string header()
     }
 
     return sink.data;
+}
+
+
+final class InvalidColourException : Exception
+{
+    this(const string message)
+    {
+        super(message);
+    }
 }
 
 
