@@ -22,6 +22,7 @@ else
 void main(string[] args)
 {
     import std.array : Appender;
+    import std.conv : ConvException;
     import std.getopt;
 
     Context ctx;
@@ -55,6 +56,11 @@ void main(string[] args)
     {
         writeln("Error: ", e.msg);
         writeln("--help displays the help screen.");
+        return;
+    }
+    catch (ConvException e)
+    {
+        writeln("Error parsing argument: ", e.msg);
         return;
     }
     catch (Exception e)
