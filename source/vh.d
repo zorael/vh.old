@@ -37,6 +37,8 @@ void main(string[] args)
                 &ctx.settings.colourSettingString,
             "hidden|a", "Display hidden files (--hidden=false to disable)",
                 &ctx.settings.showHidden,
+            "progress|p", "Display progress bar (dots)",
+                &ctx.settings.progress,
             "verbose|v", "Enable verbose output",
                 &ctx.settings.verbose,
         );
@@ -94,8 +96,9 @@ struct Context
         enum ColourSetting { off, auto_, always }
 
         ColourSetting colourSetting = ColourSetting.auto_;
-        bool showHidden = true;
         uint lines = 3;
+        bool showHidden = true;
+        bool progress = true;
         bool verbose;
 
         void colourSettingString(string nil, string option)
@@ -189,7 +192,7 @@ void populate(ref Context ctx, string[] paths)
                 if (entry.name.isNormalFile(ctx.settings) && entry.name.canBeRead)
                 {
                     filelist ~= entry.name;
-                    write(".");
+                    if (ctx.settings.progress) write(".");
                 }
                 else
                 {
@@ -203,7 +206,7 @@ void populate(ref Context ctx, string[] paths)
         else if (path.isNormalFile(ctx.settings) && path.canBeRead)
         {
             filelist ~= path;
-            write(".");
+            if (ctx.settings.progress) write(".");
         }
         else
         {
