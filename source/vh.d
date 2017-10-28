@@ -367,7 +367,7 @@ void process(Sink)(Context ctx, ref Sink sink)
 
 bool isNormalFile(const string filename, Context.Settings settings)
 {
-    import std.file : getAttributes, isFile;
+    import std.file : getAttributes, isFile, FileException;
 
     try
     {
@@ -404,6 +404,11 @@ bool isNormalFile(const string filename, Context.Settings settings)
                 !(attr & (FILE_ATTRIBUTE_DEVICE | FILE_ATTRIBUTE_SYSTEM));
         }
         else assert(0, "Unknown platform");
+    }
+    catch (FileException e)
+    {
+        // possible broken link
+        return false;
     }
     catch (Exception e)
     {
