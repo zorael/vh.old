@@ -398,7 +398,8 @@ size_t longestFilenameLength(const FileHead[] fileheads) pure @nogc nothrow
 
 string withoutDotSlash(const string filename) pure @nogc nothrow
 {
-    assert((filename.length > 2), filename);
+    if (filename.length < 3) return filename;
+
     version(Posix)
     {
         return (filename[0..2] == "./") ? filename[2..$] : filename;
