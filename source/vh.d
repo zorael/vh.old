@@ -8,7 +8,7 @@ import std.stdio;
 
 enum VHInfo
 {
-    version_ = "0.4.5",
+    version_ = "0.5.0",
     built = __TIMESTAMP__,
     source = "https://github.com/zorael/vh"
 }
