@@ -72,6 +72,7 @@ void main(string[] args)
 
 struct Context
 {
+    Settings settings;
     FileHead[] files;
     size_t skippedFiles;
     size_t skippedDirs;
@@ -107,22 +108,18 @@ struct Context
         bool useColours()
         {
             with (ColourSetting)
+            version(Posix)
             {
-                version(Posix)
-                {
-                    return (colourSetting == always) || (colourSetting == auto_);
-                }
-                else version(Windows)
-                {
-                    // auto means off in Windows
-                    return (colourSetting == always);
-                }
-                else assert(0, "Unknown platform");
+                return (colourSetting == always) || (colourSetting == auto_);
             }
+            else version(Windows)
+            {
+                // auto means off in Windows
+                return (colourSetting == always);
+            }
+            else assert(0, "Unknown platform");
         }
     }
-
-    Settings settings;
 }
 
 
