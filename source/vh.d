@@ -33,9 +33,9 @@ void main(string[] args)
             config.stopOnFirstNonOption,
             "lines|n", "Number of lines to display",
                 &ctx.settings.lines,
-            "colour", "Display with Bash colouring [off|auto|always]",
+            "colour|color", "Display with Bash colouring [off|auto|always]",
                 &ctx.settings.colourSettingString,
-            "hidden|a", "Display hidden files",
+            "hidden|a", "Display hidden files (--hidden=false to disable)",
                 &ctx.settings.showHidden,
         );
 
