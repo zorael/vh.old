@@ -21,6 +21,7 @@ void main()
 else
 void main(string[] args)
 {
+    import std.array : Appender;
     import std.getopt;
 
     Context ctx;
@@ -62,11 +63,14 @@ void main(string[] args)
         return;
     }
 
+    Appender!string sink;
+    sink.reserve(2048);  // probably overkill, but at least then no reallocation
     string[] paths = (args.length > 1) ? args[1..$] : [ "." ];
 
     ctx.populate(paths);
+    ctx.process(sink);
     writeln();
-    ctx.present();
+    writeln(sink.data);
 }
 
 
@@ -238,7 +242,7 @@ void gather(T)(T lines, const string filename, ref Context ctx)
 }
 
 
-void present(Context ctx)
+void process(Sink)(Context ctx, ref Sink sink)
 {
     import std.algorithm : SwapStrategy, uniq, sort;
     import std.concurrency : Generator;
@@ -251,7 +255,7 @@ void present(Context ctx)
     }
 
     size_t longestLength = ctx.files.longestFilenameLength;
-    immutable pattern = " %%-%ds  %%d: %%s".format(longestLength);
+    immutable pattern = " %%-%ds  %%d: %%s\n".format(longestLength);
 
     auto uniqueFiles = ctx.files
         .sort!((a,b) => (a.filename < b.filename), SwapStrategy.stable)
@@ -261,7 +265,7 @@ void present(Context ctx)
     {
         if (ctx.settings.useColours)
         {
-            write(colourGenerator.front);
+            sink.put(colourGenerator.front);
             colourGenerator.popFront();
         }
 
@@ -270,23 +274,17 @@ void present(Context ctx)
 
         if (!filehead.linecount)
         {
-            writefln(pattern, filehead.filename.withoutDotSlash,
-                     0, bashResetToken ~ "< empty >");
+            sink.put(pattern.format(filehead.filename.withoutDotSlash, 0,
+                     bashResetToken ~ "< empty >"));
             continue;
         }
 
         foreach (immutable lineNumber, line; filehead.lines)
         {
-            if (lineNumber == 0)
-            {
-                writefln(pattern, filehead.filename.withoutDotSlash,
-                        lineNumber+1, line);
-            }
-            else
-            {
-                writefln(pattern, string.init, lineNumber+1, line);
-            }
+            immutable filename = (lineNumber == 0) ?
+                filehead.filename.withoutDotSlash : string.init;
 
+            sink.put(pattern.format(filename, lineNumber+1, line));
             printedLines = true;
             ++linesConsumed;
         }
@@ -294,27 +292,32 @@ void present(Context ctx)
         if (filehead.linecount > linesConsumed)
         {
             immutable linesTruncated = (filehead.linecount - linesConsumed);
-            immutable truncatedPattern = format(" %%-%ds%s  [%%d %s truncated]",
-                    longestLength, bashResetToken,
-                    linesTruncated.plurality("line", "lines"));
+            immutable truncatedPattern =
+                format(" %%-%ds%s  [%%d %s truncated]\n",
+                       longestLength, bashResetToken,
+                       linesTruncated.plurality("line", "lines"));
 
             if (printedLines)
             {
-                writefln(truncatedPattern, string.init, linesTruncated);
+                sink.put(truncatedPattern.format(string.init, linesTruncated));
             }
             else
             {
-                writefln(truncatedPattern, filehead.filename.withoutDotSlash,
-                         linesTruncated);
+                sink.put(truncatedPattern
+                    .format(filehead.filename.withoutDotSlash, linesTruncated));
             }
         }
     }
 
-    if (ctx.settings.useColours) writeln(bashResetToken);
-    writefln("%d %s listed, with %d %s and %d %s skipped",
+    if (ctx.settings.useColours)
+    {
+        sink.put(bashResetToken);
+    }
+
+    sink.put("\n%d %s listed, with %d %s and %d %s skipped".format(
         ctx.files.length, ctx.files.length.plurality("file", "files"),
         ctx.skippedFiles, ctx.skippedFiles.plurality("file", "files"),
-        ctx.skippedDirs, ctx.skippedDirs.plurality("directory", "directories"));
+        ctx.skippedDirs, ctx.skippedDirs.plurality("directory", "directories")));
 }
 
 
