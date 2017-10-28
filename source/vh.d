@@ -141,11 +141,11 @@ struct FileHead
 
     this(const string filename, const size_t linecount, string[] lines)
     {
-        assert((filename.length), filename);
+        assert(filename.length, filename);
 
         this.filename = filename;
         this.linecount = linecount;
-        this.lines = lines;
+        this.lines = lines;  // no need to dup, it's fresh from byLineCopy
     }
 }
 
@@ -528,6 +528,7 @@ unittest
     {
         immutable code = "%s[%d;%dm".format(BashColourToken, BashFormat.bright,
             cast(size_t)colour);
+
         assert(colourGenerator.front == code);
         colourGenerator.popFront();
     }
@@ -537,6 +538,7 @@ unittest
 string header()
 {
     import std.array : Appender;
+
     Appender!string sink;
     sink.reserve(128);  // usually 91 characters
 
