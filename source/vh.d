@@ -320,10 +320,37 @@ void process(Sink)(Context ctx, ref Sink sink)
         sink.put(bashResetToken);
     }
 
-    sink.put("\n%d %s listed, with %d %s and %d %s skipped".format(
-        ctx.files.length, ctx.files.length.plurality("file", "files"),
-        ctx.skippedFiles, ctx.skippedFiles.plurality("file", "files"),
-        ctx.skippedDirs, ctx.skippedDirs.plurality("directory", "directories")));
+    sink.put("\n%d %s listed".format(ctx.files.length,
+        ctx.files.length.plurality("file", "files")));
+
+    if (ctx.skippedFiles || ctx.skippedDirs)
+    {
+        sink.put(", with ");
+    }
+    else
+    {
+        sink.put('.');
+        return;
+    }
+
+    if (ctx.skippedFiles)
+    {
+        sink.put("%d %s ".format(ctx.skippedFiles,
+            ctx.skippedFiles.plurality("file", "files")));
+
+        if (ctx.skippedDirs) sink.put("and ");
+    }
+
+    if (ctx.skippedDirs)
+    {
+        sink.put("%d %s ".format(ctx.skippedDirs,
+            ctx.skippedDirs.plurality("directory", "directories")));
+    }
+
+    if (ctx.skippedFiles || ctx.skippedDirs)
+    {
+        sink.put("skipped.");
+    }
 }
 
 
