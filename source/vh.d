@@ -37,6 +37,8 @@ void main(string[] args)
                 &ctx.settings.colourSettingString,
             "hidden|a", "Display hidden files (--hidden=false to disable)",
                 &ctx.settings.showHidden,
+            "verbose|v", "Enable verbose output",
+                &ctx.settings.verbose,
         );
 
         if (helpInformation.helpWanted)
@@ -94,6 +96,7 @@ struct Context
         ColourSetting colourSetting = ColourSetting.auto_;
         bool showHidden = true;
         uint lines = 3;
+        bool verbose;
 
         void colourSettingString(string nil, string option)
         {
@@ -174,6 +177,8 @@ void populate(ref Context ctx, string[] paths)
 
             foreach (entry; entries)
             {
+                if (ctx.settings.verbose) writeln(entry.name);
+
                 if (entry.isDir)
                 {
                     // don't recurse
@@ -189,6 +194,7 @@ void populate(ref Context ctx, string[] paths)
                 else
                 {
                     // not a normal file (FIFO etc) or reading threw exception
+                    if (ctx.settings.verbose) writeln("(skipped)");
                     ++ctx.skippedFiles;
                 }
 
@@ -202,6 +208,7 @@ void populate(ref Context ctx, string[] paths)
         else
         {
             // ditto
+            if (ctx.settings.verbose) writeln("(skipped)");
             ++ctx.skippedFiles;
         }
     }
@@ -231,6 +238,7 @@ void gather(T)(T lines, const string filename, ref Context ctx)
         }
         catch (UTFException e)
         {
+            if (ctx.settings.verbose) writeln(e.msg);
             ++ctx.skippedFiles;
             return;
         }
