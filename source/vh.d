@@ -198,30 +198,22 @@ void populate(ref Context ctx, string[] paths)
                     continue;
                 }
 
-                if (entry.name.isNormalFile(ctx.settings) && entry.name.canBeRead)
+                if (ctx.testPath(entry.name, filelist)) write('.');
+                else if (ctx.settings.verbose)
                 {
-                    filelist ~= entry.name;
-                    if (ctx.settings.progress) write(".");
+                    writeln("(skipped)");
                 }
-                else
-                {
-                    // not a normal file (FIFO etc) or reading threw exception
-                    if (ctx.settings.verbose) writeln("(skipped)");
-                    ++ctx.skippedFiles;
-                }
-
             }
-        }
-        else if (path.isNormalFile(ctx.settings) && path.canBeRead)
-        {
-            filelist ~= path;
-            if (ctx.settings.progress) write(".");
         }
         else
         {
-            // ditto
-            if (ctx.settings.verbose) writeln("(skipped)");
-            ++ctx.skippedFiles;
+            if (ctx.settings.verbose) writeln(path);
+
+            if (ctx.testPath(path, filelist)) write('.');
+            else if (ctx.settings.verbose)
+            {
+                writeln("(skipped)");
+            }
         }
     }
 
@@ -376,6 +368,22 @@ void summarise(Sink)(const Context ctx, Sink sink)
     if (ctx.skippedFiles || ctx.skippedDirs)
     {
         sink.put("skipped.");
+    }
+}
+
+
+bool testPath(ref Context ctx, const string filename, ref string[] filelist) @safe
+{
+    if (filename.isNormalFile(ctx.settings) && filename.canBeRead)
+    {
+        filelist ~= filename;
+        return true;
+    }
+    else
+    {
+        // not a normal file (FIFO etc) or reading threw exception
+        ++ctx.skippedFiles;
+        return false;
     }
 }
 
