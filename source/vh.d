@@ -51,11 +51,6 @@ void main(string[] args)
             return;
         }
     }
-    catch (const InvalidColourException e)
-    {
-        writeln(e.msg);
-        return;
-    }
     catch (const GetOptException e)
     {
         writeln("Error: ", e.msg);
@@ -116,8 +111,7 @@ struct Context
                 colourSetting = always;
                 break;
             default:
-                throw new InvalidColourException(`Invalid colour: "%s"`
-                    .format(option));
+                throw new Exception(`Invalid colour: "%s"`.format(option));
             }
         }
 
@@ -616,15 +610,6 @@ string header() pure @safe @property
     }
 
     return sink.data;
-}
-
-
-final class InvalidColourException : Exception
-{
-    this(const string message) pure nothrow @nogc @safe
-    {
-        super(message);
-    }
 }
 
 
