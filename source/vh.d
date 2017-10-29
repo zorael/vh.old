@@ -101,7 +101,7 @@ struct Context
         bool progress = true;
         bool verbose;
 
-        void colourSettingString(string nil, string option)
+        void colourSettingString(string nil, string option) pure @safe
         {
             with (ColourSetting)
             switch (option)
@@ -121,7 +121,7 @@ struct Context
             }
         }
 
-        bool useColours()
+        bool useColours() pure nothrow @nogc @safe
         {
             with (ColourSetting)
             version(Posix)
@@ -146,6 +146,7 @@ struct FileHead
     string[] lines;
 
     this(const string filename, const size_t linecount, string[] lines)
+        pure nothrow @nogc @safe
     {
         assert(filename.length, filename);
 
@@ -371,7 +372,7 @@ void summarise(Sink)(Context ctx, ref Sink sink)
 }
 
 
-bool isNormalFile(const string filename, Context.Settings settings)
+bool isNormalFile(const string filename, Context.Settings settings) @safe @property
 {
     import std.file : getAttributes, isFile, FileException;
 
@@ -425,7 +426,7 @@ bool isNormalFile(const string filename, Context.Settings settings)
 }
 
 
-bool canBeRead(const string filename)
+bool canBeRead(const string filename) nothrow @safe @property
 {
     try File(filename, "r");
     catch (Exception e)
@@ -437,7 +438,7 @@ bool canBeRead(const string filename)
 }
 
 
-size_t longestFilenameLength(const FileHead[] fileheads) pure @nogc nothrow
+size_t longestFilenameLength(const FileHead[] fileheads) pure nothrow @nogc @safe @property
 {
     size_t longest;
 
@@ -451,7 +452,7 @@ size_t longestFilenameLength(const FileHead[] fileheads) pure @nogc nothrow
 }
 
 
-string withoutDotSlash(const string filename) pure @nogc nothrow
+string withoutDotSlash(const string filename) pure nothrow @nogc @safe @property
 {
     if (filename.length < 3) return filename;
 
@@ -466,7 +467,7 @@ string withoutDotSlash(const string filename) pure @nogc nothrow
     else assert(0, "Unknown platform");
 }
 
-unittest
+@safe unittest
 {
     {
         immutable without = "./herp".withoutDotSlash;
@@ -487,12 +488,12 @@ unittest
 }
 
 
-string plurality(ptrdiff_t num, string singular, string plural) pure @nogc nothrow
+string plurality(ptrdiff_t num, string singular, string plural) pure nothrow @nogc @safe
 {
     return ((num == 1) || (num == -1)) ? singular : plural;
 }
 
-unittest
+@safe unittest
 {
     {
         immutable singular = 1.plurality("cat", "cats");
@@ -546,7 +547,7 @@ void cycleBashColours()
     }
 }
 
-unittest
+@system unittest
 {
     import std.concurrency : Generator;
 
@@ -584,7 +585,7 @@ unittest
 }
 
 
-string header()
+string header() pure @safe @property
 {
     import std.array : Appender;
 
@@ -604,7 +605,7 @@ string header()
 
 final class InvalidColourException : Exception
 {
-    this(const string message)
+    this(const string message) pure nothrow @nogc @safe
     {
         super(message);
     }
