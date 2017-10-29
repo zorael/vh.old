@@ -161,7 +161,7 @@ void populate(ref Context ctx, string[] paths)
 {
     import std.algorithm.sorting : sort;
     import std.algorithm.iteration : uniq;
-    import std.file : dirEntries, SpanMode;
+    import std.file : dirEntries, SpanMode, FileException;
     import std.path : exists, isDir, isFile;
 
     string[] filelist;
@@ -175,7 +175,21 @@ void populate(ref Context ctx, string[] paths)
             continue;
         }
 
-        if (path.isDir)
+        bool dir;
+
+        try
+        {
+            dir = path.isDir;
+        }
+        catch (const FileException e)
+        {
+            // No such file or directory
+            // assume it's a file. is there a way to tell?
+            ++ctx.skippedFiles;
+            continue;
+        }
+
+        if (dir)
         {
             auto entries = path.dirEntries(SpanMode.shallow);
 
