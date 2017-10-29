@@ -51,23 +51,23 @@ void main(string[] args)
             return;
         }
     }
-    catch (InvalidColourException e)
+    catch (const InvalidColourException e)
     {
         writeln(e.msg);
         return;
     }
-    catch (GetOptException e)
+    catch (const GetOptException e)
     {
         writeln("Error: ", e.msg);
         writeln("--help displays the help screen.");
         return;
     }
-    catch (ConvException e)
+    catch (const ConvException e)
     {
         writeln("Error parsing argument: ", e.msg);
         return;
     }
-    catch (Exception e)
+    catch (const Exception e)
     {
         writeln(e.msg);
         return;
@@ -101,7 +101,7 @@ struct Context
         bool progress = true;
         bool verbose;
 
-        void colourSettingString(string nil, string option) pure @safe
+        void colourSettingString(const string nil, const string option) pure @safe
         {
             with (ColourSetting)
             switch (option)
@@ -121,7 +121,7 @@ struct Context
             }
         }
 
-        bool useColours() pure nothrow @nogc @safe
+        bool useColours() const pure nothrow @nogc @safe
         {
             with (ColourSetting)
             version(Posix)
@@ -166,7 +166,7 @@ void populate(ref Context ctx, string[] paths)
 
     string[] filelist;
 
-    foreach (path; paths.sort().uniq)
+    foreach (const path; paths.sort().uniq)
     {
         if (!path.exists)
         {
@@ -217,7 +217,7 @@ void populate(ref Context ctx, string[] paths)
         }
     }
 
-    foreach (filename; filelist)
+    foreach (const filename; filelist)
     {
         File(filename, "r").byLineCopy.gather(filename, ctx);
     }
@@ -231,7 +231,7 @@ void gather(T)(T lines, const string filename, ref Context ctx)
 
     Appender!(string[]) sink;
 
-    foreach (line; lines.take(ctx.settings.lines))
+    foreach (const line; lines.take(ctx.settings.lines))
     {
         import std.utf : UTFException, validate;
 
@@ -240,7 +240,7 @@ void gather(T)(T lines, const string filename, ref Context ctx)
             validate(line);
             sink.put(line);
         }
-        catch (UTFException e)
+        catch (const UTFException e)
         {
             if (ctx.settings.verbose) writeln(e.msg);
             ++ctx.skippedFiles;
@@ -250,7 +250,7 @@ void gather(T)(T lines, const string filename, ref Context ctx)
 
     size_t linecount = sink.data.length;
 
-    foreach (line; lines)
+    foreach (const line; lines)
     {
         // expensive exhaustion
         ++linecount;
@@ -279,7 +279,7 @@ void process(Sink)(Context ctx, ref Sink sink)
         .sort!((a,b) => (a.filename < b.filename), SwapStrategy.stable)
         .uniq;
 
-    foreach (filehead; uniqueFiles)
+    foreach (const filehead; uniqueFiles)
     {
         if (ctx.settings.useColours)
         {
@@ -297,7 +297,7 @@ void process(Sink)(Context ctx, ref Sink sink)
             continue;
         }
 
-        foreach (immutable lineNumber, line; filehead.lines)
+        foreach (immutable lineNumber, const line; filehead.lines)
         {
             immutable filename = (lineNumber == 0) ?
                 filehead.filename.withoutDotSlash : string.init;
@@ -336,7 +336,7 @@ void process(Sink)(Context ctx, ref Sink sink)
 }
 
 
-void summarise(Sink)(Context ctx, ref Sink sink)
+void summarise(Sink)(const Context ctx, Sink sink)
 {
     sink.put("\n%d %s listed".format(ctx.files.length,
         ctx.files.length.plurality("file", "files")));
@@ -372,7 +372,7 @@ void summarise(Sink)(Context ctx, ref Sink sink)
 }
 
 
-bool isNormalFile(const string filename, Context.Settings settings) @safe @property
+bool isNormalFile(const string filename, const Context.Settings settings) @safe @property
 {
     import std.file : getAttributes, isFile, FileException;
 
@@ -412,13 +412,15 @@ bool isNormalFile(const string filename, Context.Settings settings) @safe @prope
         }
         else assert(0, "Unknown platform");
     }
-    catch (FileException e)
+    catch (const FileException e)
     {
         // possible broken link
+        if (settings.verbose) writeln(e.msg);
         return false;
     }
-    catch (Exception e)
+    catch (const Exception e)
     {
+        // always print this as we don't know what can cause it (debug purposes)
         writeln();
         writeln(e.msg);
         return false;
@@ -429,7 +431,7 @@ bool isNormalFile(const string filename, Context.Settings settings) @safe @prope
 bool canBeRead(const string filename) nothrow @safe @property
 {
     try File(filename, "r");
-    catch (Exception e)
+    catch (const Exception e)
     {
         return false;
     }
@@ -442,7 +444,7 @@ size_t longestFilenameLength(const FileHead[] fileheads) pure nothrow @nogc @saf
 {
     size_t longest;
 
-    foreach (filehead; fileheads)
+    foreach (const filehead; fileheads)
     {
         immutable dotlessLength = filehead.filename.withoutDotSlash.length;
         longest = (dotlessLength > longest) ? dotlessLength : longest;
@@ -541,7 +543,7 @@ void cycleBashColours()
         F.white,
     ];
 
-    foreach (code; colours.cycle)
+    foreach (const code; colours.cycle)
     {
         yield("%s[%d;%dm".format(BashColourToken, BashFormat.bright, code));
     }
@@ -574,7 +576,7 @@ void cycleBashColours()
 
     auto colourGenerator = new Generator!string(&cycleBashColours);
 
-    foreach (i, colour; colours)
+    foreach (const colour; colours)
     {
         immutable code = "%s[%d;%dm".format(BashColourToken, BashFormat.bright,
             cast(size_t)colour);
