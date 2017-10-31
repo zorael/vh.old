@@ -39,6 +39,8 @@ void main(string[] args)
                 &ctx.settings.showHidden,
             "progress|p", "Display progress bar (dots)",
                 &ctx.settings.progress,
+            "truncated|t", "Show truncated line count (--truncated=false to disable)",
+                &ctx.settings.showTruncated,
             "verbose|v", "Enable verbose output",
                 &ctx.settings.verbose,
         );
@@ -94,6 +96,7 @@ struct Context
         uint lines = 3;
         bool showHidden = true;
         bool progress = true;
+        bool showTruncated = true;
         bool verbose;
 
         void colourSettingString(const string nil, const string option) pure @safe
@@ -313,7 +316,14 @@ void process(Sink)(Context ctx, ref Sink sink)
             ++linesConsumed;
         }
 
-        if (filehead.linecount > linesConsumed)
+        if (!ctx.settings.showTruncated)
+        {
+            immutable noTruncatedPattern =
+                format(" %%-%ds%s  [...]\n",
+                       longestLength, bashResetToken);
+            sink.put(noTruncatedPattern.format(string.init));
+        }
+        else if (filehead.linecount > linesConsumed)
         {
             immutable linesTruncated = (filehead.linecount - linesConsumed);
             immutable truncatedPattern =
