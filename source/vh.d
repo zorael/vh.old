@@ -198,7 +198,10 @@ void populate(ref Context ctx, string[] paths)
                     continue;
                 }
 
-                if (ctx.testPath(entry.name, filelist)) write('.');
+                if (ctx.testPath(entry.name, filelist) && ctx.settings.progress)
+                {
+                    write('.');
+                }
                 else if (ctx.settings.verbose)
                 {
                     writeln("(skipped)");
@@ -209,7 +212,10 @@ void populate(ref Context ctx, string[] paths)
         {
             if (ctx.settings.verbose) writeln(path);
 
-            if (ctx.testPath(path, filelist)) write('.');
+            if (ctx.testPath(path, filelist) && ctx.settings.progress)
+            {
+                write('.');
+            }
             else if (ctx.settings.verbose)
             {
                 writeln("(skipped)");
