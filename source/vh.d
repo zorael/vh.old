@@ -332,7 +332,7 @@ void process(Sink)(Context ctx, ref Sink sink)
         if (!ctx.settings.showTruncated)
         {
             sink.formattedWrite(" %-*s%s  [...]\n", longestLength,
-                string.init, bashResetToken);
+                filehead.filename.withoutDotSlash, bashResetToken);
         }
         else if (filehead.linecount > linesConsumed)
         {
