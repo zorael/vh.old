@@ -305,7 +305,7 @@ void process(Sink)(Context ctx, ref Sink sink)
         }
 
         size_t linesConsumed;
-        bool printedLines;
+        bool linesWerePrinted;
 
         if (!filehead.linecount)
         {
@@ -325,7 +325,7 @@ void process(Sink)(Context ctx, ref Sink sink)
 
             sink.formattedWrite(pattern, longestLength, filename,
                 lineNumber+1, line);
-            printedLines = true;
+            linesWerePrinted = true;
             ++linesConsumed;
         }
 
@@ -339,7 +339,7 @@ void process(Sink)(Context ctx, ref Sink sink)
             immutable linesTruncated = (filehead.linecount - linesConsumed);
             enum truncatedPattern = " %-*s  [%d %s truncated]\n";
 
-            if (printedLines)
+            if (linesWerePrinted)
             {
                 sink.formattedWrite(truncatedPattern, longestLength,
                     string.init, linesTruncated,
