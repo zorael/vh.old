@@ -343,18 +343,20 @@ void process(Sink)(Context ctx, ref Sink sink)
         else if (filehead.linecount > linesConsumed)
         {
             immutable linesTruncated = (filehead.linecount - linesConsumed);
-            enum truncatedPattern = " %-*s  [%d %s truncated]\n";
+            enum truncatedPattern = " %-*s%s  [%d %s truncated]\n";
 
             if (linesWerePrinted)
             {
                 sink.formattedWrite(truncatedPattern, longestLength,
-                    string.init, linesTruncated,
-                    filehead.filename.withoutDotSlash, linesTruncated);
+                    string.init,
+                    bashResetToken, linesTruncated,
+                    linesTruncated.plurality("line", "lines"));
             }
             else
             {
                 sink.formattedWrite(truncatedPattern, longestLength,
-                    filehead.filename.withoutDotSlash, linesTruncated,
+                    filehead.filename.withoutDotSlash,
+                    bashResetToken, linesTruncated,
                     linesTruncated.plurality("line", "lines"));
             }
         }
