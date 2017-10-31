@@ -194,10 +194,18 @@ void populate(ref Context ctx, string[] paths)
             {
                 if (ctx.settings.verbose) writeln(entry.name);
 
-                if (entry.isDir)
+                try
                 {
-                    // don't recurse
-                    ++ctx.skippedDirs;
+                    if (entry.isDir)
+                    {
+                        // don't recurse
+                        ++ctx.skippedDirs;
+                        continue;
+                    }
+                }
+                catch (Exception e)
+                {
+                    // Failed to stat for whatever reason
                     continue;
                 }
 
