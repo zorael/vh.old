@@ -281,6 +281,7 @@ void process(Sink)(Context ctx, ref Sink sink)
 {
     import std.algorithm : SwapStrategy, uniq, sort;
     import std.concurrency : Generator;
+    import std.format : formattedWrite;
 
     Generator!string colourGenerator;
 
@@ -290,7 +291,6 @@ void process(Sink)(Context ctx, ref Sink sink)
     }
 
     size_t longestLength = ctx.files.longestFilenameLength;
-    immutable pattern = " %%-%ds  %%d: %%s\n".format(longestLength);
 
     auto uniqueFiles = ctx.files
         .sort!((a,b) => (a.filename < b.filename), SwapStrategy.stable)
@@ -309,44 +309,47 @@ void process(Sink)(Context ctx, ref Sink sink)
 
         if (!filehead.linecount)
         {
-            sink.put(pattern.format(filehead.filename.withoutDotSlash, 0,
-                     bashResetToken ~ "< empty >"));
+            immutable pattern = " %-*s  0: %s\n";
+
+            sink.formattedWrite(pattern, longestLength,
+                filehead.filename.withoutDotSlash,
+                bashResetToken ~ "< empty >");
             continue;
         }
 
         foreach (immutable lineNumber, const line; filehead.lines)
         {
+            enum pattern = " %-*s  %d: %s\n";
             immutable filename = (lineNumber == 0) ?
                 filehead.filename.withoutDotSlash : string.init;
 
-            sink.put(pattern.format(filename, lineNumber+1, line));
+            sink.formattedWrite(pattern, longestLength, filename,
+                lineNumber+1, line);
             printedLines = true;
             ++linesConsumed;
         }
 
         if (!ctx.settings.showTruncated)
         {
-            immutable noTruncatedPattern =
-                format(" %%-%ds%s  [...]\n",
-                       longestLength, bashResetToken);
-            sink.put(noTruncatedPattern.format(string.init));
+            sink.formattedWrite(" %-*s%s  [...]\n", longestLength,
+                string.init, bashResetToken);
         }
         else if (filehead.linecount > linesConsumed)
         {
             immutable linesTruncated = (filehead.linecount - linesConsumed);
-            immutable truncatedPattern =
-                format(" %%-%ds%s  [%%d %s truncated]\n",
-                       longestLength, bashResetToken,
-                       linesTruncated.plurality("line", "lines"));
+            enum truncatedPattern = " %-*s  [%d %s truncated]\n";
 
             if (printedLines)
             {
-                sink.put(truncatedPattern.format(string.init, linesTruncated));
+                sink.formattedWrite(truncatedPattern, longestLength,
+                    string.init, linesTruncated,
+                    filehead.filename.withoutDotSlash, linesTruncated);
             }
             else
             {
-                sink.put(truncatedPattern
-                    .format(filehead.filename.withoutDotSlash, linesTruncated));
+                sink.formattedWrite(truncatedPattern, longestLength,
+                    filehead.filename.withoutDotSlash, linesTruncated,
+                    linesTruncated.plurality("line", "lines"));
             }
         }
     }
@@ -362,8 +365,10 @@ void process(Sink)(Context ctx, ref Sink sink)
 
 void summarise(Sink)(const Context ctx, Sink sink)
 {
-    sink.put("\n%d %s listed".format(ctx.files.length,
-        ctx.files.length.plurality("file", "files")));
+    import std.format : formattedWrite;
+
+    sink.formattedWrite("\n %d %s listed", ctx.files.length,
+        ctx.files.length.plurality("file", "files"));
 
     if (ctx.skippedFiles || ctx.skippedDirs)
     {
@@ -377,16 +382,16 @@ void summarise(Sink)(const Context ctx, Sink sink)
 
     if (ctx.skippedFiles)
     {
-        sink.put("%d %s ".format(ctx.skippedFiles,
-            ctx.skippedFiles.plurality("file", "files")));
+        sink.formattedWrite("%d %s ", ctx.skippedFiles,
+            ctx.skippedFiles.plurality("file", "files"));
 
         if (ctx.skippedDirs) sink.put("and ");
     }
 
     if (ctx.skippedDirs)
     {
-        sink.put("%d %s ".format(ctx.skippedDirs,
-            ctx.skippedDirs.plurality("directory", "directories")));
+        sink.formattedWrite("%d %s ", ctx.skippedDirs,
+            ctx.skippedDirs.plurality("directory", "directories"));
     }
 
     if (ctx.skippedFiles || ctx.skippedDirs)
@@ -630,15 +635,16 @@ void cycleBashColours()
 string header() pure @safe @property
 {
     import std.array : Appender;
+    import std.format : formattedWrite;
 
     Appender!string sink;
     sink.reserve(128);  // usually 91 characters
 
     with (VHInfo)
     {
-        sink.put("verbose head v%s, built %s\n"
-                 .format(cast(string)version_, cast(string)built));
-        sink.put("$ git clone %s.git\n".format(cast(string)source));
+        sink.formattedWrite("verbose head v%s, built %s\n",
+            cast(string)version_, cast(string)built);
+        sink.formattedWrite("$ git clone %s.git\n", cast(string)source);
     }
 
     return sink.data;
