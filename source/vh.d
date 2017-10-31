@@ -47,8 +47,8 @@ void main(string[] args)
 
         if (helpInformation.helpWanted)
         {
-            immutable usageString = header ~
-                "\nusage: %s [options] [files|dirs] ...\n".format(args[0]);
+            immutable usageString = "%s\nusage: %s [options] [files|dirs] ...\n"
+                .format(header, args[0]);
             defaultGetoptPrinter(usageString, helpInformation.options);
             return;
         }
