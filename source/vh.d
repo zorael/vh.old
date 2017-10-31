@@ -29,30 +29,33 @@ void main(string[] args)
 
     try
     {
-        auto result = getopt(args,
-            config.stopOnFirstNonOption,
-            "lines|n", "Number of lines to display",
-                &ctx.settings.lines,
-            "colour", "Display with Bash colouring [off|auto|always]",
-                &ctx.settings.colourSettingString,
-            "color", &ctx.settings.colourSettingString,
-            "hidden|a", "Display hidden files (--hidden=false to disable)",
-                &ctx.settings.showHidden,
-            "progress|p", "Display progress bar (dots)",
-                &ctx.settings.progress,
-            "truncated|t", "Show truncated line count (--truncated=false to disable)",
-                &ctx.settings.showTruncated,
-            "truncate", &ctx.settings.showTruncated,
-            "verbose|v", "Enable verbose output",
-                &ctx.settings.verbose,
-        );
-
-        if (result.helpWanted)
+        with (ctx.settings)
         {
-            immutable usageString = "%s\nusage: %s [options] [files|dirs] ...\n"
-                .format(header, args[0]);
-            defaultGetoptPrinter(usageString, result.options);
-            return;
+            auto result = getopt(args,
+                config.stopOnFirstNonOption,
+                "lines|n", "Number of lines to display",
+                    &lines,
+                "colour", "Display with Bash colouring [off|auto|always]",
+                    &colourSettingString,
+                "color", &colourSettingString,
+                "hidden|a", "Display hidden files (--hidden=false to disable)",
+                    &showHidden,
+                "progress|p", "Display progress bar (dots)",
+                    &progress,
+                "truncated|t", "Show truncated line count (--truncated=false to disable)",
+                    &showTruncated,
+                "truncate", &showTruncated,
+                "verbose|v", "Enable verbose output",
+                    &verbose,
+            );
+
+            if (result.helpWanted)
+            {
+                immutable usageString = "%s\nusage: %s [options] [files|dirs] ...\n"
+                    .format(header, args[0]);
+                defaultGetoptPrinter(usageString, result.options);
+                return;
+            }
         }
     }
     catch (const GetOptException e)
