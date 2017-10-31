@@ -206,6 +206,7 @@ void populate(ref Context ctx, string[] paths)
                 catch (Exception e)
                 {
                     // Failed to stat for whatever reason
+                    ++ctx.skippedFiles;
                     continue;
                 }
 
