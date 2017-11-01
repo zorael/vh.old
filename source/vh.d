@@ -360,8 +360,16 @@ void process(Sink)(Context ctx, ref Sink sink)
 
         if (!ctx.settings.showTruncated)
         {
-            sink.formattedWrite(" %-*s%s  [...]\n", longestLength,
-                filehead.filename.withoutDotSlash, bashResetToken);
+            if (linesWerePrinted)
+            {
+                sink.formattedWrite(" %-*s%s  [...]\n", longestLength,
+                    string.init, bashResetToken);
+            }
+            else
+            {
+                sink.formattedWrite(" %-*s%s  [...]\n", longestLength,
+                    filehead.filename.withoutDotSlash, bashResetToken);
+            }
         }
         else if (filehead.linecount > linesConsumed)
         {
