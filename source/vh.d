@@ -98,7 +98,7 @@ struct Context
         enum ColourSetting { off, auto_, always }
 
         ColourSetting colourSetting = ColourSetting.auto_;
-        uint lines = 3;
+        uint numLines = 3;
         bool showHidden = true;
         bool progress = true;
         bool showTruncated = true;
@@ -254,7 +254,7 @@ void gather(T)(T lines, const string filename, ref Context ctx)
 
     Appender!(string[]) sink;
 
-    foreach (const line; lines.take(ctx.settings.lines))
+    foreach (const line; lines.take(ctx.settings.numLines))
     {
         import std.utf : UTFException, validate;
 
