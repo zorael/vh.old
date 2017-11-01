@@ -27,35 +27,33 @@ void main(string[] args)
 
     Context ctx;
 
+    with (ctx.settings)
     try
     {
-        with (ctx.settings)
-        {
-            auto result = getopt(args,
-                config.stopOnFirstNonOption,
-                "lines|n", "Number of lines to display",
-                    &lines,
-                "colour", "Display with Bash colouring [off|auto|always]",
-                    &colourSettingString,
-                "color", &colourSettingString,
-                "hidden|a", "Display hidden files (--hidden=false to disable)",
-                    &showHidden,
-                "progress|p", "Display progress bar (dots)",
-                    &progress,
-                "truncated|t", "Show truncated line count (--truncated=false to disable)",
-                    &showTruncated,
-                "truncate", &showTruncated,
-                "verbose|v", "Enable verbose output",
-                    &verbose,
-            );
+        auto result = getopt(args,
+            config.stopOnFirstNonOption,
+            "lines|n", "Number of lines to display",
+                &lines,
+            "colour", "Display with Bash colouring [off|auto|always]",
+                &colourSettingString,
+            "color", &colourSettingString,
+            "hidden|a", "Display hidden files (--hidden=false to disable)",
+                &showHidden,
+            "progress|p", "Display progress bar (dots)",
+                &progress,
+            "truncated|t", "Show truncated line count (--truncated=false to disable)",
+                &showTruncated,
+            "truncate", &showTruncated,
+            "verbose|v", "Enable verbose output",
+                &verbose,
+        );
 
-            if (result.helpWanted)
-            {
-                immutable usageString = "%s\nusage: %s [options] [files|dirs] ...\n"
-                    .format(header, args[0]);
-                defaultGetoptPrinter(usageString, result.options);
-                return;
-            }
+        if (result.helpWanted)
+        {
+            immutable usageString = "%s\nusage: %s [options] [files|dirs] ...\n"
+                .format(header, args[0]);
+            defaultGetoptPrinter(usageString, result.options);
+            return;
         }
     }
     catch (const GetOptException e)
