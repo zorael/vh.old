@@ -13,6 +13,7 @@ enum VHInfo
     source = "https://github.com/zorael/vh"
 }
 
+
 version(unittest)
 void main()
 {
@@ -21,7 +22,6 @@ void main()
 else
 void main(string[] args)
 {
-    import std.array : Appender;
     import std.conv : ConvException;
     import std.getopt;
 
@@ -568,7 +568,6 @@ string plurality(ptrdiff_t num, string singular, string plural) pure nothrow @no
 void cycleBashColours()
 {
     import std.concurrency : yield;
-    import std.format : format;
     import std.range : cycle;
 
     alias F = BashForeground;
