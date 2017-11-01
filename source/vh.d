@@ -6,6 +6,7 @@ import std.format : format;
 import std.stdio;
 
 
+/// Meta-information about the project
 enum VHInfo
 {
     version_ = "0.5.1",
@@ -82,6 +83,13 @@ void main(string[] args)
 }
 
 
+// Context
+/++
+ +  A collection of variables signifying the current state of the program
+ +  execution, to easily pass between functions.
+ +
+ +  This instead of having multiple globals.
+ +/
 struct Context
 {
     Settings settings;
@@ -137,6 +145,10 @@ struct Context
 }
 
 
+// FileHead
+/++
+ +  The head of a file, with the number of lines as specified in the Settings.
+ +/
 struct FileHead
 {
     string filename;
@@ -155,6 +167,11 @@ struct FileHead
 }
 
 
+// populate
+/++
+ +  Walks the paths in string[] paths and populates the Context with fileheads,
+ +  via calls to gather.
+ +/
 void populate(ref Context ctx, string[] paths)
 {
     import std.algorithm.sorting : sort;
@@ -243,6 +260,10 @@ void populate(ref Context ctx, string[] paths)
 }
 
 
+// gather
+/++
+ +  Takes a filename and gathers lines from it, producing a filehead in Context.
+ +/
 void gather(T)(T lines, const string filename, ref Context ctx)
 {
     import std.array : Appender;
@@ -279,6 +300,11 @@ void gather(T)(T lines, const string filename, ref Context ctx)
 }
 
 
+// process
+/++
+ +  Takes all the fileheads listed in Context, formats them and outputs them
+ +  listed (optionally in colours) in the passed output range sink.
+ +/
 void process(Sink)(Context ctx, ref Sink sink)
 {
     import std.algorithm : SwapStrategy, uniq, sort;
@@ -367,6 +393,11 @@ void process(Sink)(Context ctx, ref Sink sink)
 }
 
 
+// summarise
+/++
+ +  Outputs a summary of the current fileheads in the Context into the passed
+ +  output range sink.
+ +/
 void summarise(Sink)(const Context ctx, Sink sink)
 {
     import std.format : formattedWrite;
@@ -405,6 +436,11 @@ void summarise(Sink)(const Context ctx, Sink sink)
 }
 
 
+// testPath
+/++
+ +  Tests a path to see if it is a valid file and if such, appends it to the
+ +  passed string[] filelist.
+ +/
 bool testPath(ref Context ctx, const string filename, ref string[] filelist) @safe
 {
     if (filename.isNormalFile(ctx.settings) && filename.canBeRead)
@@ -421,6 +457,12 @@ bool testPath(ref Context ctx, const string filename, ref string[] filelist) @sa
 }
 
 
+// isNormalFile
+/++
+ +  Given a filename string, delve into its meta-information and try to divine
+ +  whether it is a normal (text) file or not. This takes into account settings
+ +  for hidden files.
+ +/
 bool isNormalFile(const string filename, const Context.Settings settings) @safe @property
 {
     import std.file : getAttributes, isFile, FileException;
@@ -477,6 +519,10 @@ bool isNormalFile(const string filename, const Context.Settings settings) @safe 
 }
 
 
+// canBeRead
+/++
+ +  Tries to open up a file for reading and returns the success result.
+ +/
 bool canBeRead(const string filename) nothrow @safe @property
 {
     try File(filename, "r");
@@ -489,6 +535,11 @@ bool canBeRead(const string filename) nothrow @safe @property
 }
 
 
+// longestFilenameLength
+/++
+ +  Given a list of fileheads, fetch the length of the longest filename among
+ +  them, for use in format width specifiers.
+ +/
 size_t longestFilenameLength(const FileHead[] fileheads) pure nothrow @nogc @safe @property
 {
     size_t longest;
@@ -503,6 +554,11 @@ size_t longestFilenameLength(const FileHead[] fileheads) pure nothrow @nogc @saf
 }
 
 
+// withoutDotSlash
+/++
+ +  Takes a filename in the "./filename" form and returns the slice of with the
+ +  ./-part sliced out. If there were no ./ prefix, return the filename as is.
+ +/
 string withoutDotSlash(const string filename) pure nothrow @nogc @safe @property
 {
     if (filename.length < 3) return filename;
@@ -539,6 +595,11 @@ string withoutDotSlash(const string filename) pure nothrow @nogc @safe @property
 }
 
 
+// plurality
+/++
+ +  Given a number of items, return the singular word if it is a singular item
+ +  (or negative one), else the plural word.
+ +/
 string plurality(ptrdiff_t num, string singular, string plural) pure nothrow @nogc @safe
 {
     return ((num == 1) || (num == -1)) ? singular : plural;
@@ -565,6 +626,11 @@ string plurality(ptrdiff_t num, string singular, string plural) pure nothrow @no
 }
 
 
+// cycleBashColours
+/++
+ +  A Generator fiber that cycles through an internal list of Bash colours,
+ +  returning a new one upon each fiber evocation.
+ +/
 void cycleBashColours()
 {
     import std.concurrency : yield;
@@ -635,6 +701,11 @@ void cycleBashColours()
 }
 
 
+// header
+/++
+ +  Returns some information about the program, based on the information in the
+ +  VHInfo enum.
+ +/
 string header() pure @safe @property
 {
     import std.array : Appender;
@@ -654,4 +725,6 @@ string header() pure @safe @property
 }
 
 
+/// The Bash colour token that resets everything (foreground colour, background
+/// colours and effects) to default.
 enum bashResetToken = "%s[%dm".format(BashColourToken, BashReset.all);
