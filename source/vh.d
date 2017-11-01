@@ -73,14 +73,12 @@ void main(string[] args)
         return;
     }
 
-    Appender!string sink;
-    sink.reserve(2048);  // probably overkill, but at least then no reallocation
     string[] paths = (args.length > 1) ? args[1..$] : [ "." ];
+    auto output = stdout.lockingTextWriter;
 
     ctx.populate(paths);
-    ctx.process(sink);
+    ctx.process(output);
     writeln();
-    writeln(sink.data);
 }
 
 
