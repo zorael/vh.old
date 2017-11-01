@@ -78,6 +78,7 @@ void main(string[] args)
     auto output = stdout.lockingTextWriter;
 
     ctx.populate(paths);
+    writeln();  // linebreak after progress bar dots
     ctx.process(output);
     writeln();
 }
