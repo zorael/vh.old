@@ -88,8 +88,8 @@ struct Context
 {
     Settings settings;
     FileHead[] files;
-    size_t skippedFiles;
-    size_t skippedDirs;
+    uint skippedFiles;
+    uint skippedDirs;
 
     struct Settings
     {
@@ -308,7 +308,7 @@ void process(Sink)(Context ctx, ref Sink sink)
             colourGenerator.popFront();
         }
 
-        size_t linesConsumed;
+        uint linesConsumed;
         bool linesWerePrinted;
 
         if (!filehead.linecount)
