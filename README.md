@@ -1,10 +1,8 @@
 # vh  [![Build Status](https://travis-ci.org/zorael/vh.svg?branch=master)](https://travis-ci.org/zorael/vh)
 
-verbose head
-
 This tool acts like the terminal tool `head`, verbosely performed on all files in your current directory or on paths specified on the command-line.
 
-By default only the first three lines are shown, as `head -n3 *` would have displayed, but the line count is configurable via command-line switches. There is support for coloured output and on Posix systems this will default to enabled, whereas on Windows it defaults to off. The behaviour can be overridden with the `--colour` switch.
+By default only the first three lines are shown, as `head -n3 *` would have displayed, but the line count is configurable via command-line switches. There is support for coloured output and on Posix systems this will default to enabled, whereas on Windows it defaults to off. The behaviour can be overridden with the `--colour` switch. See the `--help` menu for a listing of all switches.
 
 ## Getting started
 
@@ -40,4 +38,4 @@ Merely place the `vh` executable somewhere in your `PATH`, and execute it as nor
 * code cleanup
 
 ## License
-This project is licensed under the **MIT License** see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License**; see the [LICENSE](LICENSE) file for details.
