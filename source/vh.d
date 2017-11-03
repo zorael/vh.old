@@ -32,7 +32,6 @@ void main(string[] args)
     try
     {
         auto result = getopt(args,
-            config.stopOnFirstNonOption,
             "lines|n", "Number of lines to display",
                 &numLines,
             "colour", "Display with Bash colouring [off|auto|always]",
