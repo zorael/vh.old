@@ -159,7 +159,7 @@ struct FileHead
     this(const string filename, const size_t linecount, string[] lines)
         pure nothrow @nogc @safe
     {
-        assert(filename.length, filename);
+        assert(filename.length, "Empty filename passed");
 
         this.filename = filename;
         this.linecount = linecount;
