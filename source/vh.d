@@ -271,6 +271,7 @@ void gather(T)(T lines, const string filename, ref Context ctx)
     import std.range : take;
 
     Appender!(string[]) sink;
+    sink.reserve(ctx.settings.numLines);
 
     foreach (const line; lines.take(ctx.settings.numLines))
     {
