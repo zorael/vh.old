@@ -9,7 +9,7 @@ import std.stdio;
 /// Meta-information about the project
 enum VHInfo
 {
-    version_ = "0.5.1",
+    version_ = "0.5.2",
     built = __TIMESTAMP__,
     source = "https://github.com/zorael/vh"
 }
