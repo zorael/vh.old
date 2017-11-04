@@ -182,10 +182,12 @@ void populate(ref Context ctx, string[] paths)
 {
     import std.algorithm.sorting : sort;
     import std.algorithm.iteration : uniq;
+    import std.array : Appender;
     import std.file : dirEntries, SpanMode, FileException;
     import std.path : exists, isDir, isFile;
 
-    string[] filelist;
+    Appender!(string[]) filelist;
+    filelist.reserve(numFilesToReserveFor);
 
     foreach (const path; paths.sort().uniq)
     {
@@ -262,7 +264,7 @@ void populate(ref Context ctx, string[] paths)
     import core.memory : GC;
     GC.disable();
 
-    foreach (const filename; filelist)
+    foreach (const filename; filelist.data)
     {
         import bylinefast;
 
@@ -478,7 +480,7 @@ void summarise(Sink)(const Context ctx, Sink sink)
  +  Tests a path to see if it is a valid file and if such, appends it to the
  +  passed string[] filelist.
  +/
-bool testPath(ref Context ctx, const string filename, ref string[] filelist) @safe
+bool testPath(R)(ref Context ctx, const string filename, ref R filelist) @safe
 {
     if (filename.isNormalFile(ctx.settings) && filename.canBeRead)
     {
