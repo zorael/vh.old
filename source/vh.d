@@ -369,10 +369,11 @@ void process(Sink)(Context ctx, ref Sink sink)
         if (filehead.linecount == 0)
         {
             immutable pattern = " %-*s  0: %s\n";
+            enum emptyText = bashResetToken ~ "< empty >";
 
             sink.formattedWrite(pattern, longestLength,
                 filehead.filename.withoutDotSlash,
-                bashResetToken ~ "< empty >");
+                emptyText);
             continue;
         }
 
