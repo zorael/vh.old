@@ -278,37 +278,50 @@ void populate(ref Context ctx, string[] paths)
 /++
  +  Takes a filename and gathers lines from it, producing a filehead in Context.
  +/
-void gather(T)(T lines, const string filename, ref Context ctx)
+void gather(R)(R lines, const string filename, ref Context ctx)
 {
     import std.array : Appender;
-    import std.range : take;
+    import std.utf : UTFException, validate;
 
     Appender!(string[]) sink;
     sink.reserve(ctx.settings.numLines);
 
-    foreach (const line; lines.take(ctx.settings.numLines))
-    {
-        import std.utf : UTFException, validate;
+    int linecount;
 
-        try
+    try
+    {
+        foreach (const line; lines)
         {
-            validate(line);
-            sink.put(line.idup);
-        }
-        catch (const UTFException e)
-        {
-            if (ctx.settings.verbose) writeln(e.msg);
-            ++ctx.skippedFiles;
-            return;
+            if ((ctx.settings.numLines == 0) && (linecount == 0))
+            {
+                // If numLines is 0 we still want to try one line to see if
+                // it's a text file or a binary. Assume one line is enough
+                // to tell for now.
+
+                validate(line);
+            }
+            else if (linecount < ctx.settings.numLines)
+            {
+                write("-");
+                validate(line);
+                sink.put(line.idup);
+            }
+
+            if (!ctx.settings.showTruncated && (linecount >= ctx.settings.numLines))
+            {
+                linecount = -1;
+                break;
+            }
+
+            ++linecount;
         }
     }
-
-    size_t linecount = sink.data.length;
-
-    foreach (const line; lines)
+    catch (const UTFException e)
     {
-        // expensive exhaustion
-        ++linecount;
+        if (ctx.settings.verbose) writeln(e.msg);
+        ++ctx.skippedFiles;
+
+        return;
     }
 
     ctx.files ~= FileHead(filename, linecount, sink.data);
