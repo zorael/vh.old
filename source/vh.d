@@ -564,7 +564,8 @@ bool canBeRead(const string filename) nothrow @safe @property
  +  Given a list of fileheads, fetch the length of the longest filename among
  +  them, for use in format width specifiers.
  +/
-size_t longestFilenameLength(const FileHead[] fileheads) pure nothrow @nogc @safe @property
+size_t longestFilenameLength(const FileHead[] fileheads)
+    pure nothrow @nogc @safe @property
 {
     size_t longest;
 
@@ -624,7 +625,8 @@ string withoutDotSlash(const string filename) pure nothrow @nogc @safe @property
  +  Given a number of items, return the singular word if it is a singular item
  +  (or negative one), else the plural word.
  +/
-string plurality(ptrdiff_t num, string singular, string plural) pure nothrow @nogc @safe
+string plurality(ptrdiff_t num, string singular, string plural)
+    pure nothrow @nogc @safe
 {
     return ((num == 1) || (num == -1)) ? singular : plural;
 }
