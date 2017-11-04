@@ -259,9 +259,17 @@ void populate(ref Context ctx, string[] paths)
         }
     }
 
+    import core.memory : GC;
+    GC.disable();
+
     foreach (const filename; filelist)
     {
-        File(filename, "r").byLineCopy.gather(filename, ctx);
+        import bylinefast;
+
+        filename
+            .File("r")
+            .ByLineFast
+            .gather(filename, ctx);
     }
 }
 
@@ -285,7 +293,7 @@ void gather(T)(T lines, const string filename, ref Context ctx)
         try
         {
             validate(line);
-            sink.put(line);
+            sink.put(line.idup);
         }
         catch (const UTFException e)
         {
