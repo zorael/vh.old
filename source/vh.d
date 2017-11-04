@@ -270,7 +270,7 @@ void populate(ref Context ctx, string[] paths)
 
         filename
             .File("r")
-            .ByLineFast
+            .ByLineFast(8192)
             .gather(filename, ctx);
     }
 }
