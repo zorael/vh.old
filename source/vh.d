@@ -15,6 +15,9 @@ enum VHInfo
 }
 
 
+enum numFilesToReserveFor = 32;
+
+
 version(unittest)
 void main()
 {
@@ -27,6 +30,7 @@ void main(string[] args)
     import std.getopt;
 
     Context ctx;
+    ctx.files.reserve(numFilesToReserveFor);
 
     with (ctx.settings)
     try
@@ -92,8 +96,10 @@ void main(string[] args)
  +/
 struct Context
 {
+    import std.array : Appender;
+
     Settings settings;
-    FileHead[] files;
+    Appender!(FileHead[]) files;
     uint skippedFiles;
     uint skippedDirs;
 
@@ -319,9 +325,10 @@ void process(Sink)(Context ctx, ref Sink sink)
         colourGenerator = new Generator!string(&cycleBashColours);
     }
 
-    size_t longestLength = ctx.files.longestFilenameLength;
+    size_t longestLength = ctx.files.data.longestFilenameLength;
 
     auto uniqueFiles = ctx.files
+        .data
         .sort!((a,b) => (a.filename < b.filename), SwapStrategy.stable)
         .uniq;
 
@@ -411,8 +418,8 @@ void summarise(Sink)(const Context ctx, Sink sink)
 {
     import std.format : formattedWrite;
 
-    sink.formattedWrite("\n %d %s listed", ctx.files.length,
-        ctx.files.length.plurality("file", "files"));
+    sink.formattedWrite("\n %d %s listed", ctx.files.data.length,
+        ctx.files.data.length.plurality("file", "files"));
 
     if (ctx.skippedFiles || ctx.skippedDirs)
     {
