@@ -158,10 +158,10 @@ struct Context
 struct FileHead
 {
     string filename;
-    size_t linecount;
+    int linecount;
     string[] lines;
 
-    this(const string filename, const size_t linecount, string[] lines)
+    this(const string filename, const int linecount, string[] lines)
         pure nothrow @nogc @safe
     {
         assert(filename.length, "Empty filename passed");
@@ -366,7 +366,7 @@ void process(Sink)(Context ctx, ref Sink sink)
         uint linesConsumed;
         bool linesWerePrinted;
 
-        if (!filehead.linecount)
+        if (filehead.linecount == 0)
         {
             immutable pattern = " %-*s  0: %s\n";
 
