@@ -304,7 +304,6 @@ void gather(R)(R lines, const string filename, ref Context ctx)
             }
             else if (linecount < ctx.settings.numLines)
             {
-                write("-");
                 validate(line);
                 sink.put(line.idup);
             }
