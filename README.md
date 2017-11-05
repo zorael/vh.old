@@ -1,5 +1,7 @@
 # vh  [![Build Status](https://travis-ci.org/zorael/vh.svg?branch=master)](https://travis-ci.org/zorael/vh)
 
+![vh of /usr/lib](https://i.imgur.com/7T78MQ8.png)
+
 This tool acts like the terminal tool `head`, verbosely performed on all files in your current directory or on paths specified on the command-line.
 
 By default only the first three lines are shown, as `head -n3 *` would have displayed, but the line count is configurable via command-line switches. There is support for coloured output and on Posix systems this will default to enabled, whereas on Windows it defaults to off. The behaviour can be overridden with the `--colour` switch. See the `--help` menu for a listing of all switches.
